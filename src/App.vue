@@ -1,28 +1,40 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+  <v-app id="app">
+    <Header></Header>
+    <v-main>
+      <Bulletinboard></Bulletinboard>
+    </v-main>
+    <Ticker></Ticker>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+  import Bulletinboard from './components/Bulletinboard.vue'
+  import Header from './components/Header.vue'
+  import Ticker from './components/Ticker.vue'
 
-export default {
-  name: "App",
-  components: {
-    HelloWorld
+  export default {
+    name: 'Vulletinboard',
+    components: { Bulletinboard, Header, Ticker },
+    data: () => ({}),
+    created() {
+      console.log(this.$vuetify)
+    },
   }
-};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+  }
+
+  .titlebartext {
+    z-index: 1;
+  }
 </style>

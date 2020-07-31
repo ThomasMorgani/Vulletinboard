@@ -30,6 +30,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
+    font-size: 62.5%;
     margin: 0;
     padding: 0;
   }

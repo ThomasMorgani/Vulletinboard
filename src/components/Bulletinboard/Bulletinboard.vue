@@ -1,24 +1,16 @@
 <template>
-  <v-container fluid class="mainContainer" v-resize="onResize">
-    <!--TOP BANNER -->
-
-    <!--MID EVENT LIST/IMAGE -->
+  <v-container fluid class="mainContainer">
     <v-row wrap align-center ref="mainRow" >
+    <!--EVENT LIST -->
       <v-col cols="4" class="pa-0" >
         <EventList :articles="articles" @showNextEvent="showNextEvent"></EventList>
-   
       </v-col cols="4">
-      <v-flex>
+    <!--IMAGE -->
+      <v-col cols="8" class="text-center">
         <v-slide-x-transition leave-absolute>
-          <v-img
-            contain
-            :src="'https://eipl.org/bulletinboard/assets/images/' + displayedImage"
-            style="background-color: rgba(0,0,0,0.05);"
-            :key="displayedImage"
-            transition="v-slide-x-transition"
-          ></v-img>
+          <EventImage :key="displayedEventImage" :image="displayedEventImage"></EventImage>
         </v-slide-x-transition>
-      </v-flex>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -27,12 +19,15 @@
   import {seedData} from '@/assets/store/data.js'
   const {articles:articlesData, settings:appSettings} = seedData
 
-  import EventList from '@/components/Eventlist'  
+
+  import EventList from '@/components/Bulletinboard/Eventlist'  
+  import EventImage from '@/components/Bulletinboard/Eventimage'  
     
   export default {
     name: 'Bulletinboard',
     components: { 
       EventList,
+      EventImage
     },
     data: () => ({
       activeEvent: 0,
@@ -41,36 +36,30 @@
         height: 0,
         width: 0,
       },
-      eventChangeInterval: 7000,
-      eventList: [],
-      initialEventCount: 0,
+      articleTimer: 7000,
+      initialEventCount: 2,
+      intervalId: null,
       isMounted: false,
 
     }),
     methods: {
-      getArticles() {
+      async getArticles() {
         //fetch articles here
+        console.log(articlesData)
         return [...articlesData] || []
       },
-      onResize() {
-        this.windowSize = { x: window.innerWidth, y: window.innerHeight }
-        this.setStyleMainRow()
-        this.setStyleEventList()
-      },
+
       selectEvent(id) {
         this.activeEvent = id
       },
-      setStyleEventList: function() {
-        if (this.$refs.eventListTitleCard) this.$set(this.styleEventList, 'height', this.attrMainRow['height'] - this.$refs.eventListTitleCard.$el['clientHeight'] + 'px')
-      },
-      setStyleMainRow: function() {
-        if (this.$refs.bannerRow) {
-          this.$set(this.attrMainRow, 'height', this.windowSize.y - this.$refs.bannerRow['clientHeight'])
-          this.$set(this.styleMainRow, 'height', this.windowSize.y - this.$refs.bannerRow['clientHeight'] + 'px')
+
+      showNextEvent() {
+        if (Array.isArray(this.articles)) {
+          const article = this.articles.shift()
+          this.articles.push(article)
         }
-      },
-      showNextEvent: function() {
-        var element, currentelement
+        return
+        //TODO: DELETE, CONFIRM NOT NEEDED
         if (parseInt(this.activeEvent) < this.articles.length - 1) {
           this.activeEvent++
           currentelement = 'listItem' + this.activeEvent
@@ -102,7 +91,7 @@
       },
     },
     computed: {
-      displayedImage: function() {
+      displayedEventImage: function() {
         return this.articles && this.activeEvent ? this.articles[this.activeEvent]['content_media'] : ''
       },
     },
@@ -110,15 +99,16 @@
       console.log(articlesData)
       // console.log(articles)
     },
-    mounted() {
-      this.articles = this.getArticles()
+    async mounted() {
+      this.articles = await this.getArticles()
       return
       if (this.articles) {
-        setTimeout(this.onResize, 2000)
         this.initialEventCount = this.articles.length
-        this.articles = this.getArticles()
-        setInterval(this.showNextEvent, this.eventChangeInterval)
+        this.intervalId = setInterval(this.showNextEvent, this.articleTimer)
       }
+    },
+    beforeDestroy() {
+      clearInterval(this.intervalId)
     },
   }
 </script>
@@ -127,4 +117,6 @@
   .container {
     padding: .25em 1em;
   }
+
+  
 </style>

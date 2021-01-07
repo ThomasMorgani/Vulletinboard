@@ -8,14 +8,14 @@
         <v-icon color="white">mdi mdi-calendar-blank-outline</v-icon>
       </v-card-title>
     </v-card>
-    <div class="articleList">
-      <EventItem v-for="article in articles" :key="article.id" :article="article" class="ma-1"></EventItem>
-    </div>
+    <v-scroll-y-reverse-transition group class="articleList">
+      <EventItem v-for="(article, key) in articles" :key="article.id" :id="`listItem${key}`" :article="article" :isActive="key === 0" class="ma-1"></EventItem>
+    </v-scroll-y-reverse-transition>
   </div>
 </template>
 
 <script>
-  import EventItem from '@/components/Eventitem'
+  import EventItem from '@/components/Bulletinboard/Eventitem'
 
   export default {
     name: 'EventList',

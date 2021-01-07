@@ -2,28 +2,23 @@
   <v-app id="app">
     <Header></Header>
     <v-main>
-      <Bulletinboard></Bulletinboard>
+      <router-view />
     </v-main>
-    <Ticker></Ticker>
+    <Ticker v-if="$route.name === 'Bulletinboard'"></Ticker>
   </v-app>
 </template>
-
 <script>
-  import Bulletinboard from './components/Bulletinboard.vue'
-  import Header from './components/Header.vue'
-  import Ticker from './components/Ticker.vue'
-
+  import Header from '@/components/Header'
+  import Ticker from '@/components/Bulletinboard/Ticker'
   export default {
     name: 'Vulletinboard',
-    components: { Bulletinboard, Header, Ticker },
-    data: () => ({}),
-    created() {
-      console.log(this.$vuetify)
+    components: {
+      Header,
+      Ticker,
     },
   }
 </script>
-
-<style>
+<style lang="scss">
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -34,7 +29,6 @@
     margin: 0;
     padding: 0;
   }
-
   .titlebartext {
     z-index: 1;
   }

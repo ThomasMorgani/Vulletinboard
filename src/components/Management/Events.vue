@@ -1,9 +1,39 @@
 <template>
   <v-card flat>
     <v-card-title class="title primary--text">
-      EVENTS
-      <v-spacer></v-spacer>
-      <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
+      <v-row>
+        <v-col cols="8">
+          <v-card flat height="8rem" max-height="8rem">
+            <v-tabs vertical v-model="tabs">
+              <v-tab>
+                <v-icon left>
+                  mdi-information
+                </v-icon>
+              </v-tab>
+              <v-tab>
+                <v-icon left>
+                  mdi-filter
+                </v-icon>
+              </v-tab>
+              <v-tab>
+                <v-icon left>
+                  mdi-key
+                </v-icon>
+              </v-tab>
+              <v-tabs-items v-model="tabs">
+                <v-tab-item key="info"><Info :counts="counts"></Info> </v-tab-item>
+                <v-tab-item key="filter">FILTER </v-tab-item>
+                <v-tab-item key="legend">
+                  <Legend></Legend>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-tabs>
+          </v-card>
+        </v-col>
+        <v-col class="d-flex align-end">
+          <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
+        </v-col>
+      </v-row>
     </v-card-title>
     <v-card-text>
       <v-data-table
@@ -83,8 +113,12 @@
 </template>
 
 <script>
+  import events from '@/data/events.json'
+  import Info from '@/components/Management/Info'
+  import Legend from '@/components/Management/Legend'
   export default {
     name: 'Eventstable',
+    components: { Info, Legend },
     data: () => ({
       currentDateTime: new Date(),
       loading: true,
@@ -104,8 +138,20 @@
       ],
       items: [],
       search: null,
+      tabs: null,
     }),
-    computed: {},
+    computed: {
+      counts() {
+        const counts = {
+          active: 1,
+          pastDate: 1,
+          scheduledActive: 1,
+          scheduledExpired: 1,
+          scheduledPending: 1,
+        }
+        return counts
+      },
+    },
     methods: {
       scheduleIcon(item) {
         if (
@@ -159,6 +205,14 @@
             this.loading = false
           })
       },
+      initializeOffline() {
+        const eventList = events
+        this.items = eventList.map(item => {
+          item.scheduleIconData = this.scheduleIcon(item)
+          return item
+        })
+        this.loading = false
+      },
       testEventExpired(eventDate) {
         const schedDate = new Date(eventDate)
         return {
@@ -167,7 +221,8 @@
       },
     },
     created() {
-      this.initialize()
+      // this.initialize()
+      this.initializeOffline()
     },
   }
 </script>

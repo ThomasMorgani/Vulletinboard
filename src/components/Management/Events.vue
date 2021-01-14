@@ -39,7 +39,7 @@
       <v-data-table
         :loading="loading"
         :headers="headers"
-        :items="items"
+        :items="itemsList"
         :search="search"
         hide-default-footer
         :options="{ itemsPerPage: 10000 }"
@@ -113,14 +113,13 @@
 </template>
 
 <script>
-  import events from '@/data/events.json'
+  import items from '@/data/events.json'
   import Info from '@/components/Management/Info'
   import Legend from '@/components/Management/Legend'
   export default {
-    name: 'Eventstable',
+    name: 'itemstable',
     components: { Info, Legend },
     data: () => ({
-      currentDateTime: new Date(),
       loading: true,
       headers: [
         {
@@ -143,50 +142,50 @@
     computed: {
       counts() {
         const counts = {
-          active: 1,
-          pastDate: 1,
-          scheduledActive: 1,
-          scheduledExpired: 1,
-          scheduledPending: 1,
+          active: 0,
+          pastDate: 0,
+          scheduledActive: 0,
+          scheduledExpired: 0,
+          scheduledPending: 0,
         }
+        this.itemsList.forEach(item => {
+          if (item.isActive) {
+            counts.active++
+          }
+          if (item.isPastitemDate) {
+            counts.pastDate++
+          }
+          if (item.isScheduleActive) {
+            counts.scheduledActive++
+          }
+          if (item.isScheduleExpired) {
+            counts.scheduledExpired++
+          }
+          if (item.isSchedulePending) {
+            counts.scheduledPending++
+          }
+        })
         return counts
+      },
+      itemsList() {
+        return this.items.map(item => {
+          item.isActive = this.isActive(item)
+          item.isPastitemDate = this.isPastitemDate(item)
+          item.isScheduleActive = this.isScheduleActive(item)
+          item.isScheduleExpired = this.isScheduleExpired(item)
+          item.isSchedulePending = this.isSchedulePending(item)
+          item.scheduleIconData = this.scheduleIcon(item)
+          return item
+        })
+      },
+      now() {
+        const currentDt = new Date()
+        return currentDt
       },
     },
     methods: {
-      scheduleIcon(item) {
-        if (
-          item?.visibleScheduleStart === 'noschedule' ||
-          item?.visibleScheduleStart === 'ERROR' ||
-          item?.visibleScheduleEnd === 'noschedule' ||
-          item?.visibleScheduleEnd === 'ERROR'
-        ) {
-          return { icon: '', color: '', tooltip: '' }
-        } else {
-          const schedStartDate = new Date(item['visibleScheduleStart'])
-          const schedEndDate = new Date(item['visibleScheduleEnd'])
-          switch (true) {
-            case this.currentDateTime < schedStartDate:
-              return {
-                icon: 'mdi-alarm',
-                color: 'primary',
-                tooltip: `<strong>PENDING</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
-              }
-            case this.currentDateTime > schedStartDate && this.currentDateTime < schedEndDate:
-              return {
-                icon: 'mdi-alarm-check',
-                color: 'success',
-                tooltip: `<strong>ACTIVE</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
-              }
-            case this.currentDateTime > schedEndDate:
-              return {
-                icon: 'mdi-alarm-off',
-                color: 'error',
-                tooltip: `<strong>EXPIRED</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
-              }
-            default:
-              return { icon: '', color: '', tooltip: '' }
-          }
-        }
+      DatetimeFromTimestamp(timestamp) {
+        return new Date(timestamp.substring(' ', 'T'))
       },
       initialize() {
         this.loading = true
@@ -204,19 +203,83 @@
           .then(() => {
             this.loading = false
           })
+          .catchAll(err => console.log('error init:', err))
       },
       initializeOffline() {
-        const eventList = events
-        this.items = eventList.map(item => {
+        const itemList = items
+        this.items = itemList.map(item => {
           item.scheduleIconData = this.scheduleIcon(item)
           return item
         })
         this.loading = false
       },
-      testEventExpired(eventDate) {
-        const schedDate = new Date(eventDate)
-        return {
-          redText: this.currentDateTime > schedDate,
+      isActive(item) {
+        return Boolean(item.visible)
+      },
+      isPastitemDate(item) {
+        if (item.content_scheduled_date) {
+          const itemDate = new Date(item.content_scheduled_date)
+          return itemDate < this.now
+        } else {
+          return false
+        }
+      },
+      isScheduleActive(item) {
+        if (item.visibleScheduleEnd && item.visibleScheduleStart) {
+          const schedStartDate = new Date(item.visibleScheduleStart)
+          const schedEndDate = new Date(item.visibleScheduleEnd)
+          return this.now > schedStartDate && this.now < schedEndDate
+        } else {
+          return false
+        }
+      },
+      isScheduleExpired(item) {
+        if (item.visibleScheduleEnd) {
+          const schedEndDate = new Date(item.visibleScheduleEnd)
+          return schedEndDate < this.now
+        } else {
+          return false
+        }
+      },
+      isSchedulePending(item) {
+        if (item.visibleScheduleStart) {
+          const schedStartDate = new Date(item.visibleScheduleStart)
+          return this.now < schedStartDate
+        } else {
+          return false
+        }
+      },
+      scheduleIcon(item) {
+        if (
+          item?.visibleScheduleStart === 'noschedule' ||
+          item?.visibleScheduleStart === 'ERROR' ||
+          item?.visibleScheduleEnd === 'noschedule' ||
+          item?.visibleScheduleEnd === 'ERROR'
+        ) {
+          return { icon: '', color: '', tooltip: '' }
+        } else {
+          switch (true) {
+            case item.isSchedulePending:
+              return {
+                icon: 'mdi-alarm',
+                color: 'primary',
+                tooltip: `<strong>PENDING</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+              }
+            case item.isScheduleActive:
+              return {
+                icon: 'mdi-alarm-check',
+                color: 'success',
+                tooltip: `<strong>ACTIVE</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+              }
+            case item.isScheduleExpired:
+              return {
+                icon: 'mdi-alarm-off',
+                color: 'error',
+                tooltip: `<strong>EXPIRED</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+              }
+            default:
+              return { icon: '', color: '', tooltip: '' }
+          }
         }
       },
     },

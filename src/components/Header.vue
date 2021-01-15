@@ -1,12 +1,12 @@
 <template>
-  <v-app-bar app text color="primary" min-height="1" height="100" max-height="105">
+  <v-app-bar app text color="primary" min-height="1" height="80" max-height="105">
     <v-toolbar-title class="secondary--text logo" v-text="title"></v-toolbar-title>
     <!-- <template v-slot:img="{ props }">
       <v-img v-bind="props" contain position="left center" height="100%" min-height="100%" class="banner"></v-img>
     </template> -->
     <v-spacer></v-spacer>
     <v-toolbar-items>
-      <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn>
+      <!-- <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn> -->
       <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Manage Content </v-btn>
       <v-btn text class="secondary--text"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
       <v-menu bottom offset-y>

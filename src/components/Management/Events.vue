@@ -4,25 +4,29 @@
       <v-row>
         <v-col cols="8">
           <v-card flat height="8rem" max-height="8rem">
-            <v-tabs vertical v-model="tabs">
-              <v-tab>
-                <v-icon left>
+            <v-tabs v-model="tabs" height="40">
+              <v-tab width="50">
+                <v-icon>
                   mdi-information
                 </v-icon>
               </v-tab>
               <v-tab>
-                <v-icon left>
-                  mdi-filter
-                </v-icon>
+                <v-badge :content="filtersCount" :value="filtersCount" color="green" top overlap>
+                  <v-icon>
+                    mdi-filter
+                  </v-icon>
+                </v-badge>
               </v-tab>
               <v-tab>
-                <v-icon left>
+                <v-icon>
                   mdi-key
                 </v-icon>
               </v-tab>
               <v-tabs-items v-model="tabs">
                 <v-tab-item key="info"><Info :counts="counts"></Info> </v-tab-item>
-                <v-tab-item key="filter">FILTER </v-tab-item>
+                <v-tab-item key="filter"
+                  ><Filters :filters="filters" :filtersCount="filtersCount" @filtersClear="onFiltersClear" @filterToggle="onFilterToggle" @></Filters>
+                </v-tab-item>
                 <v-tab-item key="legend">
                   <Legend></Legend>
                 </v-tab-item>
@@ -30,8 +34,12 @@
             </v-tabs>
           </v-card>
         </v-col>
-        <v-col class="d-flex align-end">
-          <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
+        <v-col>
+          <v-card flat height="8rem" max-height="8rem" class="d-flex align-content-space-between flex-wrap">
+            <v-btn block color="primary"> <v-icon left>mdi-plus </v-icon> ADD NEW </v-btn>
+
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
+          </v-card>
         </v-col>
       </v-row>
     </v-card-title>
@@ -45,7 +53,7 @@
         :options="{ itemsPerPage: 10000 }"
         height="70vh"
         fixed-header
-        class="elevation-1"
+        class="elevation-1 mt-2"
       >
         <template v-slot:body="{ items }">
           <tbody>
@@ -60,8 +68,8 @@
                 </v-tooltip>
               </td>
 
-              <td class="text-left">
-                <font>{{ item.user_friendly_scheduled_date }} </font>
+              <td class="text-left" :class="item.isPastitemDate ? 'error--text' : ''">
+                {{ item.user_friendly_scheduled_date }}
               </td>
 
               <td class="text-center">
@@ -115,12 +123,39 @@
 <script>
   import items from '@/data/events.json'
   import Info from '@/components/Management/Info'
+  import Filters from '@/components/Management/Filters'
   import Legend from '@/components/Management/Legend'
   export default {
     name: 'itemstable',
-    components: { Info, Legend },
+    components: { Filters, Info, Legend },
     data: () => ({
-      loading: true,
+      filters: {
+        isActive: {
+          name: 'isActive',
+          label: 'Visible',
+          value: false,
+        },
+        isHidden: {
+          name: 'isHidden',
+          label: 'Hidden',
+          value: false,
+        },
+        isScheduleActive: {
+          name: 'isScheduleActive',
+          label: 'Schedule Active',
+          value: false,
+        },
+        isScheduleExpired: {
+          name: 'isScheduleExpired',
+          label: 'Schedule Expired',
+          value: false,
+        },
+        isSchedulePending: {
+          name: 'isSchedulePending',
+          label: 'Schedule Pending',
+          value: false,
+        },
+      },
       headers: [
         {
           text: 'TITLE',
@@ -136,6 +171,7 @@
         { text: '', value: 'visible', align: 'end', sortable: false },
       ],
       items: [],
+      loading: true,
       search: null,
       tabs: null,
     }),
@@ -167,9 +203,15 @@
         })
         return counts
       },
+      filtersCount() {
+        let count = 0
+        Object.values(this.filters).forEach(filter => filter.value && count++)
+        return count
+      },
       itemsList() {
-        return this.items.map(item => {
+        let list = this.items.map(item => {
           item.isActive = this.isActive(item)
+          item.isHidden = !item.isActive
           item.isPastitemDate = this.isPastitemDate(item)
           item.isScheduleActive = this.isScheduleActive(item)
           item.isScheduleExpired = this.isScheduleExpired(item)
@@ -177,6 +219,12 @@
           item.scheduleIconData = this.scheduleIcon(item)
           return item
         })
+        for (let filter in this.filters) {
+          if (this.filters[filter].value) {
+            list = [...list].filter(item => item[filter])
+          }
+        }
+        return list
       },
       now() {
         const currentDt = new Date()
@@ -214,7 +262,7 @@
         this.loading = false
       },
       isActive(item) {
-        return Boolean(item.visible)
+        return item.visible == true
       },
       isPastitemDate(item) {
         if (item.content_scheduled_date) {
@@ -248,6 +296,14 @@
         } else {
           return false
         }
+      },
+      onFiltersClear() {
+        for (let filter in this.filters) {
+          this.filters[filter].value = false
+        }
+      },
+      onFilterToggle(filter) {
+        this.filters[filter].value = !this.filters[filter].value
       },
       scheduleIcon(item) {
         if (
@@ -290,4 +346,8 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .v-tab {
+    min-width: unset;
+  }
+</style>

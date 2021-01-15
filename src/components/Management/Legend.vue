@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-card-title class="subheading primary--text">
+    <v-card-title class="subheading primary--text pt-1 pb-2 pl-0 ">
       LEGEND
     </v-card-title>
     <!-- <v-card :height="100"> -->

@@ -17,7 +17,7 @@
     </td>
     <!-- MEDIA TYPE -->
     <td class="text-center">
-      <v-icon color="blue" v-if="item.content_media" style="cursor: pointer" @click="modalImage = item.content_media" @click.stop="showImageModal = true">
+      <v-icon color="blue" v-if="item.content_media" style="cursor: pointer" @click="$emit('mediaModalToggle', { show: true, media: 'img', src: item.content_media })">
         mdi-image
       </v-icon>
     </td>
@@ -26,20 +26,6 @@
       <v-btn icon :color="item.isActive ? 'success' : 'error'" :loading="false" @click="$emit('visibilityToggle', item)">
         <v-icon v-text="item.isActive ? 'mdi-eye' : 'mdi-eye-off'"></v-icon
       ></v-btn>
-
-      <!-- <div v-if="item.loading == 'loading'">
-        <v-progress-circular indeterminate :width="3"></v-progress-circular>
-      </div>
-      <div v-else-if="item.visible == 1">
-        <v-icon color="green" style="cursor: pointer" @click="changeVisibility(item)">
-          mdi-eye
-        </v-icon>
-      </div>
-      <div v-else-if="item.visible == 0">
-        <v-icon color="red" @click="changeVisibility(item)">
-          mdi-eye-off
-        </v-icon>
-      </div> -->
     </td>
     <!-- SCHEDULE -->
     <td class="text-center">

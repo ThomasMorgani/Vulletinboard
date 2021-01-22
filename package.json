@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.8.2",
+    "dotenv": "^8.2.0",
     "rss-parser": "^3.10.0",
     "vue": "^2.6.12",
     "vue-axios": "^3.2.2",

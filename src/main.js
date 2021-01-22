@@ -8,6 +8,10 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 
 Vue.config.productionTip = false
+
+import { apiSettings } from '../.env'
+Vue.prototype.$api = apiSettings
+
 Vue.use(VueAxios, axios)
 new Vue({
   vuetify,

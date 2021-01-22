@@ -6,26 +6,20 @@
           <v-card flat height="8rem" max-height="8rem">
             <v-tabs v-model="tabs" height="40">
               <v-tab width="50">
-                <v-icon>
-                  mdi-information
-                </v-icon>
+                <v-icon> mdi-information </v-icon>
               </v-tab>
               <v-tab>
                 <v-badge :content="filtersCount" :value="filtersCount" color="green" top overlap>
-                  <v-icon>
-                    mdi-filter
-                  </v-icon>
+                  <v-icon> mdi-filter </v-icon>
                 </v-badge>
               </v-tab>
               <v-tab>
-                <v-icon>
-                  mdi-key
-                </v-icon>
+                <v-icon> mdi-key </v-icon>
               </v-tab>
               <v-tabs-items v-model="tabs">
                 <v-tab-item key="info"><Info :counts="counts"></Info> </v-tab-item>
                 <v-tab-item key="filter"
-                  ><Filters :filters="filters" :filtersCount="filtersCount" @filtersClear="onFiltersClear" @filterToggle="onFilterToggle" @></Filters>
+                  ><Filters :filters="filters" :filtersCount="filtersCount" @filtersClear="onFiltersClear" @filterToggle="onFilterToggle"></Filters>
                 </v-tab-item>
                 <v-tab-item key="legend">
                   <Legend></Legend>
@@ -57,26 +51,28 @@
       >
         <template v-slot:body="{ items }">
           <tbody>
-            <Row v-for="item in items" :key="item.id" :item="item" @visibilityToggle="onVisibilityToggle"></Row>
+            <Row v-for="item in items" :key="item.id" :item="item" @mediaModalToggle="onMediaModalToggle" @visibilityToggle="onVisibilityToggle"></Row>
           </tbody>
         </template>
         <template slot="no-data">
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
+      <MediaModal :item="modalMedia" @mediaModalToggle="onMediaModalToggle"></MediaModal>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
-  import Row from '@/components/Management/EventTablerow'
   import items from '@/data/events.json'
   import Info from '@/components/Management/Info'
   import Filters from '@/components/Management/Filters'
   import Legend from '@/components/Management/Legend'
+  import MediaModal from '@/components/Management/modalMedia'
+  import Row from '@/components/Management/EventTablerow'
   export default {
     name: 'itemstable',
-    components: { Filters, Info, Legend, Row },
+    components: { Filters, Info, Legend, MediaModal, Row },
     data: () => ({
       filters: {
         isActive: {
@@ -112,15 +108,48 @@
           sortable: true,
           value: 'content_title',
         },
-        { text: 'DESCRIPTION', value: 'content_desc', align: 'start', sortable: true },
-        { text: 'DATE', value: 'content_scheduled_date', align: 'start', sortable: true },
-        { text: 'MEDIA', value: 'content_media', align: 'center', sortable: false },
-        { text: 'VISIBLE', value: 'content_media', align: 'center', sortable: false },
-        { text: 'SCHEDULE', value: 'visibleScheduleStart', align: 'center', sortable: false },
+        {
+          text: 'DESCRIPTION',
+          value: 'content_desc',
+          align: 'start',
+          sortable: true,
+        },
+        {
+          text: 'DATE',
+          value: 'content_scheduled_date',
+          align: 'start',
+          sortable: true,
+        },
+        {
+          text: 'MEDIA',
+          value: 'content_media',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          text: 'VISIBLE',
+          value: 'content_media',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          text: 'SCHEDULE',
+          value: 'visibleScheduleStart',
+          align: 'center',
+          sortable: false,
+        },
         { text: '', value: 'visible', align: 'end', sortable: false },
       ],
       items: [],
       loading: true,
+      modalEdit: {
+        show: false,
+      },
+      modalMedia: {
+        show: false,
+        media: 'img',
+        src: null,
+      },
       search: null,
       tabs: null,
     }),
@@ -253,6 +282,10 @@
       },
       onFilterToggle(filter) {
         this.filters[filter].value = !this.filters[filter].value
+      },
+      onMediaModalToggle(content) {
+        console.log(content)
+        this.modalMedia = { ...content }
       },
       onVisibilityToggle(item) {
         this.items = [...this.items].map(i => {

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <v-sheet color="transparent">
     <Events></Events>
-  </div>
+  </v-sheet>
 </template>
 
 <script>

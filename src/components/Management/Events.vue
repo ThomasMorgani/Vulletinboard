@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat color="transparent">
     <v-card-title class="title primary--text">
       <v-row>
         <v-col cols="8">
@@ -57,59 +57,7 @@
       >
         <template v-slot:body="{ items }">
           <tbody>
-            <tr v-for="item in items" :key="item.id">
-              <td class="text-left font-weight-bold">{{ item.content_title }}</td>
-              <td class="text-left">
-                <v-tooltip top color="primary">
-                  <template v-slot:activator="{ on, attrs }">
-                    <span v-bind="attrs" v-on="on">{{ item.content_desc && item.content_desc.length > 40 ? item.content_desc.substring(0, 40) + '...' : item.content_desc }} </span>
-                  </template>
-                  <span>{{ item.content_desc }}</span>
-                </v-tooltip>
-              </td>
-
-              <td class="text-left" :class="item.isPastitemDate ? 'error--text' : ''">
-                {{ item.user_friendly_scheduled_date }}
-              </td>
-
-              <td class="text-center">
-                <v-icon color="blue" v-if="item.content_media" style="cursor: pointer" @click="modalImage = item.content_media" @click.stop="showImageModal = true">
-                  mdi-image
-                </v-icon>
-              </td>
-              <td class="text-center">
-                <div v-if="item.loading == 'loading'">
-                  <v-progress-circular indeterminate :width="3"></v-progress-circular>
-                </div>
-                <div v-else-if="item.visible == 1">
-                  <v-icon color="green" style="cursor: pointer" @click="changeVisibility(item)">
-                    mdi-eye
-                  </v-icon>
-                </div>
-                <div v-else-if="item.visible == 0">
-                  <v-icon color="red" @click="changeVisibility(item)">
-                    mdi-eye-off
-                  </v-icon>
-                </div>
-              </td>
-              <td class="text-center">
-                <v-tooltip top :color="item.scheduleIconData.color" :disabled="item.scheduleIconData.tooltip === ''">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-on="on" v-bind="attrs" :color="item.scheduleIconData.color">{{ item.scheduleIconData.icon }}</v-icon>
-                  </template>
-                  <span v-html="item.scheduleIconData.tooltip"></span>
-                </v-tooltip>
-              </td>
-
-              <td class="justify-center layout px-0">
-                <v-btn icon class="mx-0" @click="editItem(item)">
-                  <v-icon color="teal">mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn icon class="mx-0" @click="deleteItem(item)">
-                  <v-icon color="pink">mdi-delete</v-icon>
-                </v-btn>
-              </td>
-            </tr>
+            <Row v-for="item in items" :key="item.id" :item="item" @visibilityToggle="onVisibilityToggle"></Row>
           </tbody>
         </template>
         <template slot="no-data">
@@ -121,13 +69,14 @@
 </template>
 
 <script>
+  import Row from '@/components/Management/EventTablerow'
   import items from '@/data/events.json'
   import Info from '@/components/Management/Info'
   import Filters from '@/components/Management/Filters'
   import Legend from '@/components/Management/Legend'
   export default {
     name: 'itemstable',
-    components: { Filters, Info, Legend },
+    components: { Filters, Info, Legend, Row },
     data: () => ({
       filters: {
         isActive: {
@@ -304,6 +253,16 @@
       },
       onFilterToggle(filter) {
         this.filters[filter].value = !this.filters[filter].value
+      },
+      onVisibilityToggle(item) {
+        this.items = [...this.items].map(i => {
+          if (i.id === item.id) {
+            i.visible = i.visible == 0 ? 1 : 0
+            return i
+          } else {
+            return i
+          }
+        })
       },
       scheduleIcon(item) {
         if (

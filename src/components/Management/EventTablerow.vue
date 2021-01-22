@@ -39,7 +39,7 @@
 
     <!-- ACTIONS -->
     <td class="justify-center layout px-0">
-      <v-btn icon class="mx-0" @click="editItem(item)">
+      <v-btn icon class="mx-0" @click="$emit('itemEdit', item)">
         <v-icon color="teal">mdi-pencil</v-icon>
       </v-btn>
       <v-btn icon class="mx-0" @click="deleteItem(item)">

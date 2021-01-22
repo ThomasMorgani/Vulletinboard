@@ -7,6 +7,7 @@
     <v-spacer></v-spacer>
     <v-toolbar-items>
       <!-- <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn> -->
+      <v-btn text class="secondary--text" exact :to="{ name: 'Bulletinboard' }"> <v-icon left>mdi-pin</v-icon>Bulletinboard </v-btn>
       <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Manage Content </v-btn>
       <v-btn text class="secondary--text"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
       <v-menu bottom offset-y>

@@ -31,7 +31,6 @@
         <v-col>
           <v-card flat height="8rem" max-height="8rem" class="d-flex align-content-space-between flex-wrap">
             <v-btn block color="primary"> <v-icon left>mdi-plus </v-icon> ADD NEW </v-btn>
-
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
           </v-card>
         </v-col>
@@ -45,19 +44,20 @@
         :search="search"
         hide-default-footer
         :options="{ itemsPerPage: 10000 }"
-        height="70vh"
+        height="65vh"
         fixed-header
         class="elevation-1 mt-2"
       >
         <template v-slot:body="{ items }">
           <tbody>
-            <Row v-for="item in items" :key="item.id" :item="item" @mediaModalToggle="onMediaModalToggle" @visibilityToggle="onVisibilityToggle"></Row>
+            <Row v-for="item in items" :key="item.id" :item="item" @itemEdit="onItemEdit" @mediaModalToggle="onMediaModalToggle" @visibilityToggle="onVisibilityToggle"></Row>
           </tbody>
         </template>
         <template slot="no-data">
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
+      <ItemModal v-bind="modalItem" @mediaModalToggle="onMediaModalToggle"></ItemModal>
       <MediaModal :item="modalMedia" @mediaModalToggle="onMediaModalToggle"></MediaModal>
     </v-card-text>
   </v-card>
@@ -68,11 +68,12 @@
   import Info from '@/components/Management/Info'
   import Filters from '@/components/Management/Filters'
   import Legend from '@/components/Management/Legend'
+  import ItemModal from '@/components/Management/modalItem'
   import MediaModal from '@/components/Management/modalMedia'
   import Row from '@/components/Management/EventTablerow'
   export default {
-    name: 'itemstable',
-    components: { Filters, Info, Legend, MediaModal, Row },
+    name: 'itemManagement',
+    components: { Filters, Info, ItemModal, Legend, MediaModal, Row },
     data: () => ({
       filters: {
         isActive: {
@@ -140,10 +141,28 @@
         },
         { text: '', value: 'visible', align: 'end', sortable: false },
       ],
+      itemDefault: {
+        content_desc: null,
+        content_type: null,
+        content_scheduled_date: null,
+        content_title: null,
+        content_media: null,
+        content_date: null,
+        created_by: null,
+        created_on: null,
+        id: null,
+        visible: null,
+        visibleScheduleEnd: null,
+        visibleScheduleStart: null,
+      },
       items: [],
       loading: true,
-      modalEdit: {
+      modalDelete: {
         show: false,
+      },
+      modalItem: {
+        show: false,
+        item: {},
       },
       modalMedia: {
         show: false,
@@ -218,7 +237,6 @@
         this.$http
           .get('https://eipl.org/bulletinboard/index.php/contentmanager/getAllArticles')
           .then(resp => {
-            console.log(resp.data)
             if (resp?.data?.length > 0) {
               this.items = resp.data.map(item => {
                 item.scheduleIconData = this.scheduleIcon(item)
@@ -283,8 +301,10 @@
       onFilterToggle(filter) {
         this.filters[filter].value = !this.filters[filter].value
       },
+      onItemEdit(item) {
+        this.modalItem = { item, show: true }
+      },
       onMediaModalToggle(content) {
-        console.log(content)
         this.modalMedia = { ...content }
       },
       onVisibilityToggle(item) {

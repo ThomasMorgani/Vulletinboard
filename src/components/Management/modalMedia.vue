@@ -18,9 +18,6 @@
         return `${this.$api.mediaUrl}/${this.item.src}`
       },
     },
-    mounted() {
-      console.log(this.$api)
-    },
   }
 </script>
 

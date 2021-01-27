@@ -57,7 +57,7 @@
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
-      <ItemModal v-bind="modalItem" @mediaModalToggle="onMediaModalToggle"></ItemModal>
+      <ItemModal :key="modalItem.item.id + '' + modalItem.show" v-bind="{ ...modalItem, itemDefault }" @close="onItemEditClose"></ItemModal>
       <MediaModal :item="modalMedia" @mediaModalToggle="onMediaModalToggle"></MediaModal>
     </v-card-text>
   </v-card>
@@ -117,7 +117,7 @@
         },
         {
           text: 'DATE',
-          value: 'content_scheduled_date',
+          value: 'content_date',
           align: 'start',
           sortable: true,
         },
@@ -135,7 +135,7 @@
         },
         {
           text: 'SCHEDULE',
-          value: 'visibleScheduleStart',
+          value: 'scheduleStart',
           align: 'center',
           sortable: false,
         },
@@ -151,9 +151,9 @@
         created_by: null,
         created_on: null,
         id: null,
-        visible: null,
-        visibleScheduleEnd: null,
-        visibleScheduleStart: null,
+        visible: true,
+        scheduleEnd: null,
+        scheduleStart: null,
       },
       items: [],
       loading: true,
@@ -161,8 +161,8 @@
         show: false,
       },
       modalItem: {
-        show: false,
         item: {},
+        show: false,
       },
       modalMedia: {
         show: false,
@@ -239,6 +239,7 @@
           .then(resp => {
             if (resp?.data?.length > 0) {
               this.items = resp.data.map(item => {
+                item = this.itemNormalize(item)
                 item.scheduleIconData = this.scheduleIcon(item)
                 return item
               })
@@ -252,6 +253,7 @@
       initializeOffline() {
         const itemList = items
         this.items = itemList.map(item => {
+          item = this.itemNormalize(item)
           item.scheduleIconData = this.scheduleIcon(item)
           return item
         })
@@ -269,29 +271,54 @@
         }
       },
       isScheduleActive(item) {
-        if (item.visibleScheduleEnd && item.visibleScheduleStart) {
-          const schedStartDate = new Date(item.visibleScheduleStart)
-          const schedEndDate = new Date(item.visibleScheduleEnd)
+        if (item.scheduleEnd && item.scheduleStart) {
+          const schedStartDate = new Date(item.scheduleStart)
+          const schedEndDate = new Date(item.scheduleEnd)
           return this.now > schedStartDate && this.now < schedEndDate
         } else {
           return false
         }
       },
       isScheduleExpired(item) {
-        if (item.visibleScheduleEnd) {
-          const schedEndDate = new Date(item.visibleScheduleEnd)
+        if (item.scheduleEnd) {
+          const schedEndDate = new Date(item.scheduleEnd)
           return schedEndDate < this.now
         } else {
           return false
         }
       },
       isSchedulePending(item) {
-        if (item.visibleScheduleStart) {
-          const schedStartDate = new Date(item.visibleScheduleStart)
+        if (item.scheduleStart) {
+          const schedStartDate = new Date(item.scheduleStart)
           return this.now < schedStartDate
         } else {
           return false
         }
+      },
+      itemNormalize(item) {
+        //refactoring backend
+        //this method will be removed when backend returns
+        //new item properties
+        let ni = { ...item }
+
+        ni.content_date = item.content_scheduled_date
+        delete ni.content_scheduled_date
+
+        ni.media_type = 'image'
+
+        ni.scheduleEnd = item.visibleScheduleEnd
+        ni.user_friendly_scheduleEnd = item.user_friendly_visibleScheduleEnd === 'noschedule' ? null : item.user_friendly_visibleScheduleEnd
+        delete ni.visibileScheduleEnd
+        delete ni.user_friendly_visibleScheduleEnd
+
+        ni.scheduleStart = item.visibleScheduleStart
+        ni.user_friendly_scheduleStart = item.user_friendly_visibleScheduleStart === 'noschedule' ? null : item.user_friendly_visibleScheduleStart
+        delete ni.visibileScheduleStart
+        delete ni.user_friendly_visibleScheduleStart
+
+        ni.visible = item.visible == 1
+        // console.log(ni)
+        return ni
       },
       onFiltersClear() {
         for (let filter in this.filters) {
@@ -302,7 +329,10 @@
         this.filters[filter].value = !this.filters[filter].value
       },
       onItemEdit(item) {
-        this.modalItem = { item, show: true }
+        this.modalItem = { item: { ...this.itemDefault, ...item }, show: true }
+      },
+      onItemEditClose(item) {
+        this.modalItem = { item: this.itemDefault, show: false }
       },
       onMediaModalToggle(content) {
         this.modalMedia = { ...content }
@@ -318,12 +348,7 @@
         })
       },
       scheduleIcon(item) {
-        if (
-          item?.visibleScheduleStart === 'noschedule' ||
-          item?.visibleScheduleStart === 'ERROR' ||
-          item?.visibleScheduleEnd === 'noschedule' ||
-          item?.visibleScheduleEnd === 'ERROR'
-        ) {
+        if (item?.scheduleStart === 'noschedule' || item?.scheduleStart === 'ERROR' || item?.scheduleEnd === 'noschedule' || item?.scheduleEnd === 'ERROR') {
           return { icon: '', color: '', tooltip: '' }
         } else {
           switch (true) {
@@ -331,19 +356,19 @@
               return {
                 icon: 'mdi-alarm',
                 color: 'primary',
-                tooltip: `<strong>PENDING</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+                tooltip: `<strong>PENDING</strong><br /> ${item.user_friendly_scheduleStart} - ${item.user_friendly_scheduleEnd}`,
               }
             case item.isScheduleActive:
               return {
                 icon: 'mdi-alarm-check',
                 color: 'success',
-                tooltip: `<strong>ACTIVE</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+                tooltip: `<strong>ACTIVE</strong><br /> ${item.user_friendly_scheduleStart} - ${item.user_friendly_scheduleEnd}`,
               }
             case item.isScheduleExpired:
               return {
                 icon: 'mdi-alarm-off',
                 color: 'error',
-                tooltip: `<strong>EXPIRED</strong><br /> ${item.user_friendly_visibleScheduleStart} - ${item.user_friendly_visibleScheduleEnd}`,
+                tooltip: `<strong>EXPIRED</strong><br /> ${item.user_friendly_scheduleStart} - ${item.user_friendly_scheduleEnd}`,
               }
             default:
               return { icon: '', color: '', tooltip: '' }

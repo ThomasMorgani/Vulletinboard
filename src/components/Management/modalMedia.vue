@@ -15,7 +15,7 @@
     },
     computed: {
       src() {
-        return `${this.$api.mediaUrl}/${this.item.src}`
+        return `${this.$api.mediaUrl}${this.item.src}`
       },
     },
   }

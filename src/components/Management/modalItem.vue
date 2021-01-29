@@ -94,7 +94,13 @@
                         edit
                       </v-btn>
                     </template>
-                    <ScheduleEdit :item="itemEdit" :show="modalSchedule" @cancel="modalSchedule = false" @updateSchedule="onUpdateSchedule"></ScheduleEdit>
+                    <ScheduleEdit
+                      :item="itemEdit"
+                      :key="modalSchedule + ''"
+                      :show="modalSchedule"
+                      @cancel="modalSchedule = false"
+                      @updateSchedule="onUpdateSchedule"
+                    ></ScheduleEdit>
                   </v-dialog>
                 </template>
               </v-switch>

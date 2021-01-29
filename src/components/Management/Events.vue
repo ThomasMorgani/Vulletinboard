@@ -150,6 +150,8 @@
         content_date: null,
         created_by: null,
         created_on: null,
+        event_date: null,
+        event_time: null,
         id: null,
         visible: true,
         scheduleEnd: null,
@@ -298,7 +300,7 @@
       itemNormalize(item) {
         //refactoring backend
         //this method will be removed when backend returns
-        //new item properties
+        //new item properties/values
         let ni = { ...item }
 
         ni.content_date = item.content_scheduled_date
@@ -306,12 +308,12 @@
 
         ni.media_type = 'image'
 
-        ni.scheduleEnd = item.visibleScheduleEnd
+        ni.scheduleEnd = item.visibleScheduleEnd === 'noschedule' ? null : item.visibleScheduleEnd
         ni.user_friendly_scheduleEnd = item.user_friendly_visibleScheduleEnd === 'noschedule' ? null : item.user_friendly_visibleScheduleEnd
         delete ni.visibileScheduleEnd
         delete ni.user_friendly_visibleScheduleEnd
 
-        ni.scheduleStart = item.visibleScheduleStart
+        ni.scheduleStart = item.visibleScheduleStart === 'noschedule' ? null : item.visibleScheduleStart
         ni.user_friendly_scheduleStart = item.user_friendly_visibleScheduleStart === 'noschedule' ? null : item.user_friendly_visibleScheduleStart
         delete ni.visibileScheduleStart
         delete ni.user_friendly_visibleScheduleStart

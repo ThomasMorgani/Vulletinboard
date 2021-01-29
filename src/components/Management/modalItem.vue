@@ -106,6 +106,11 @@
               </v-switch>
             </v-col>
           </v-row>
+          <v-row align="center">
+            <v-col cols="12">
+              <Media :item="itemEdit"></Media>
+            </v-col>
+          </v-row>
         </form>
       </v-card-text>
       <v-card-actions>
@@ -119,6 +124,7 @@
 
 <script>
   import formats from '@/utils/formats'
+  import Media from '@/components/Management/ItemMedia'
   import ScheduleEdit from '@/components/Management/modalItemSchedule'
 
   export default {
@@ -138,6 +144,7 @@
       },
     },
     components: {
+      Media,
       ScheduleEdit,
     },
     data: () => ({

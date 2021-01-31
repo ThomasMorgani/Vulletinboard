@@ -57,8 +57,8 @@
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
-      <ItemModal :key="modalItem.item.id + '' + modalItem.show" v-bind="{ ...modalItem, itemDefault }" @close="onItemEditClose"></ItemModal>
-      <MediaModal :item="modalMedia" @mediaModalToggle="onMediaModalToggle"></MediaModal>
+      <ItemModal :key="modalItem.item.id + '' + modalItem.show" v-bind="{ ...modalItem, itemDefault }" @mediaModalToggle="onMediaModalToggle" @close="onItemEditClose"></ItemModal>
+      <MediaModal v-bind="modalMedia" @mediaModalToggle="onMediaModalToggle" @input="modalMedia.show = $event"></MediaModal>
     </v-card-text>
   </v-card>
 </template>
@@ -147,6 +147,7 @@
         content_scheduled_date: null,
         content_title: null,
         content_media: null,
+        content_media_type: null,
         content_date: null,
         created_by: null,
         created_on: null,
@@ -167,9 +168,8 @@
         show: false,
       },
       modalMedia: {
+        item: {},
         show: false,
-        media: 'img',
-        src: null,
       },
       search: null,
       tabs: null,
@@ -306,7 +306,7 @@
         ni.content_date = item.content_scheduled_date
         delete ni.content_scheduled_date
 
-        ni.media_type = 'image'
+        ni.content_media_type = 'image'
 
         ni.scheduleEnd = item.visibleScheduleEnd === 'noschedule' ? null : item.visibleScheduleEnd
         ni.user_friendly_scheduleEnd = item.user_friendly_visibleScheduleEnd === 'noschedule' ? null : item.user_friendly_visibleScheduleEnd
@@ -337,6 +337,7 @@
         this.modalItem = { item: this.itemDefault, show: false }
       },
       onMediaModalToggle(content) {
+        console.log(content)
         this.modalMedia = { ...content }
       },
       onVisibilityToggle(item) {

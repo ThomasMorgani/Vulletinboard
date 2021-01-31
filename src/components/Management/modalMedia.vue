@@ -1,10 +1,11 @@
 <template>
-  <v-dialog :key="item.src" :value="item.show" max-width="70vw" transition="dialog-transition">
-    <v-img :src="src" max-width="100%" contain @click="$emit('mediaModalToggle', { show: false, media: '', src: null })"></v-img>
+  <v-dialog :key="item.id + ''" :value="show" max-width="70vw" transition="dialog-transition" @input="$emit('input', $event)" @click.stop>
+    <ItemImage :item="item" max-width="100%" contain @imageClicked="$emit('mediaModalToggle', { item, show: false })"></ItemImage>
   </v-dialog>
 </template>
 
 <script>
+  import ItemImage from '@/components/Management/ItemImage'
   export default {
     name: 'MediaModal',
     props: {
@@ -12,11 +13,13 @@
         type: Object,
         required: true,
       },
-    },
-    computed: {
-      src() {
-        return `${this.$api.mediaUrl}${this.item.src}`
+      show: {
+        type: Boolean,
+        default: () => false,
       },
+    },
+    components: {
+      ItemImage,
     },
   }
 </script>

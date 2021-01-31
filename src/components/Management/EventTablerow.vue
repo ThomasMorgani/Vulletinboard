@@ -17,7 +17,7 @@
     </td>
     <!-- MEDIA TYPE -->
     <td class="text-center">
-      <v-icon color="blue" v-if="item.content_media" style="cursor: pointer" @click="$emit('mediaModalToggle', { show: true, media: 'img', src: item.content_media })">
+      <v-icon color="blue" v-if="item.content_media" style="cursor: pointer" @click="$emit('mediaModalToggle', { item, show: true })">
         mdi-image
       </v-icon>
     </td>

@@ -108,7 +108,7 @@
           </v-row>
           <v-row align="center">
             <v-col cols="12">
-              <Media :item="itemEdit"></Media>
+              <Media :item="itemEdit" @imageClicked="$emit('mediaModalToggle', { item: $event.item, show: true })"></Media>
             </v-col>
           </v-row>
         </form>
@@ -194,6 +194,10 @@
       },
     },
     methods: {
+      test1(e) {
+        console.log(e)
+        // $emit('mediaModalToggle', { item, show: true })
+      },
       onUpdateSchedule({ end, start }) {
         const [endDate, endTime] = end.split(' ')
         const [startDate, startTime] = start.split(' ')

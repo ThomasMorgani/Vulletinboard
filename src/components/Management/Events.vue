@@ -322,6 +322,12 @@
         // console.log(ni)
         return ni
       },
+      itemDelete(id) {
+        this.items = this.items.filter(item => item.id !== id)
+      },
+      itemSave(item) {
+        console.log('events: save item ')
+      },
       onFiltersClear() {
         for (let filter in this.filters) {
           this.filters[filter].value = false

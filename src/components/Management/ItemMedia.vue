@@ -23,8 +23,16 @@
             <v-card-text class="pa-0">
               <v-row>
                 <v-col cols="6" d-flex flex-column justify-start>
-                  <v-select v-model="typeSelect" label="Source" :items="typeOptions"></v-select>
-                  <v-text-field v-if="typeSelect === 'URL'" label="Url" prepend-icon="mdi-link"></v-text-field>
+                  <v-select v-model="typeSelect" label="Source" :items="typeOptions" @change="onSelectChange"></v-select>
+                  <v-text-field
+                    v-if="typeSelect === 'URL'"
+                    clearable
+                    label="Url"
+                    prepend-icon="mdi-link"
+                    ref="urlInput"
+                    @change="onUrlInputChange"
+                    @click:clear="onClearFileInput"
+                  ></v-text-field>
                   <v-text-field
                     v-else
                     :value="file && file.name ? file.name : item.content_media"
@@ -40,8 +48,8 @@
                 </v-col>
                 <v-col cols="6">
                   <v-card v-if="!previewSrc" flat height="100%" width="100%" class="d-flex flex-column align-center justify-space-around">
-                    <v-btn x-large text color="grey" @click="$refs.fileInput.$refs.input.click() || null">
-                      <v-icon color="grey" x-large>mdi-image-plus</v-icon>
+                    <v-btn x-large text color="grey" @click="typeSelect === 'UPLOAD' ? $refs.fileInput.$refs.input.click() : $refs.urlInput.focus()">
+                      <v-icon color="grey" x-large v-text="typeSelect === 'UPLOAD' ? 'mdi-image-plus' : 'mdi-link-box-variant-outline'"></v-icon>
                     </v-btn>
                   </v-card>
                   <v-hover v-else>
@@ -135,13 +143,24 @@
           return null
         }
       },
+      inputUrlClearIcon() {
+        if (this.inputUrl) {
+          if (this.inputUrl === this.item.media_content) {
+            return 'mdi-close'
+          } else {
+            return 'mdi-revert'
+          }
+        } else {
+          return 'mdi-close'
+        }
+      },
       previewSrc() {
         switch (true) {
           case this.inputUrl:
             return { ...this.item, media_content: this.inputUrl, media_content_type: 'url' }
             break
           case this.item?.content_media_type === 'image' || this.item?.content_media_type === 'image_url':
-            return this.item
+            return this.item.content_media
             break
           default:
             return false
@@ -161,23 +180,32 @@
         } else {
           this.$emit('mediaChange', { item: { content_media: null, content_media_type: null } })
         }
-
-        //if file
-        //revert to original item
-        //clear this.file
-        //else
-        //clear item media
       },
       onFileInputChange(file) {
         if (file) {
-          console.log(file)
-          console.log(this.file)
-          console.log(this.file.name)
           this.inputUrl = URL.createObjectURL(file)
           URL.revokeObjectURL(file)
           this.$emit('mediaChange', { item: { content_media: this.inputUrl, content_media_type: 'image_url' }, file: this.file })
         }
       },
+      onSelectChange() {
+        this.inputUrl = null
+        this.$emit('mediaChange', { item: { content_media: null, content_media_type: 'image_url' } })
+      },
+      onUrlInputChange(url) {
+        if (url) {
+          console.log(url)
+          // this.inputUrl = URL.createObjectURL(file)
+          // URL.revokeObjectURL(file)
+          this.$emit('mediaChange', { item: { content_media: url, content_media_type: 'image_url' } })
+        }
+      },
+    },
+    created() {
+      if (this.item?.content_media_type === 'image_url') {
+        this.typeSelect = 'URL'
+        this.inputUrl = this.item.content_media
+      }
     },
   }
 </script>

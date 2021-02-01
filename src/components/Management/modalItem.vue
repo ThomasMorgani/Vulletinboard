@@ -114,8 +114,37 @@
         </form>
       </v-card-text>
       <v-card-actions>
+        <v-dialog v-model="modalDelete" persistent width="300">
+          <template #activator="{attrs, on}">
+            <v-btn v-bind="attrs" v-on="on" text color="error">
+              Delete
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="title primary--text">
+              Delete Item
+            </v-card-title>
+            <v-card-text>
+              <p>Permanently delete item from list?</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn text color="primary" @click="modalDelete = false">
+                Cancel
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn text color="error" :loading="btnLoading === 'delete'" @click="itemDelete" class="font-weight-bold">
+                Delete
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-spacer></v-spacer>
         <v-btn text color="primary" @click="$emit('close')">
-          Close
+          Cancel
+        </v-btn>
+        <v-btn text color="success" @click="$emit('save')" class="font-weight-bold">
+          Save
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -148,6 +177,7 @@
       ScheduleEdit,
     },
     data: () => ({
+      btnLoading: null,
       itemEdit: null,
       mediaFile: null,
       optionsVisibility: [
@@ -198,6 +228,25 @@
       test1(e) {
         console.log(e)
         // $emit('mediaModalToggle', { item, show: true })
+      },
+      itemDelete() {
+        console.log('delete item')
+        this.btnLoading = 'delete'
+        this.$http
+          .get(`${this.$api.apiUrl}item_delete/${this.item.id}`)
+          .then(resp => {
+            if (resp?.data) {
+              const { data, message, status } = resp.data
+              if (status === 'success') {
+                //emit itemDelete
+              }
+              //snackbar
+            }
+          })
+          .catch(err => console.log('error init:', err))
+      },
+      itemSave() {
+        console.log('save item')
       },
       onMediaChange({ item, file }) {
         this.mediaFile = file

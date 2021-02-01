@@ -1,5 +1,5 @@
 <template>
-  <v-dialog ref="itemModal" :value="show" max-width="50rem" scrollable transition="dialog-transition">
+  <v-dialog ref="itemModal" :value="show" max-width="50rem" persistent scrollable transition="dialog-transition">
     <v-card min-height="85vh">
       <v-card-title class="text-title font-weight-bold primary--text">
         ITEM EDIT
@@ -108,7 +108,7 @@
           </v-row>
           <v-row align="center">
             <v-col cols="12">
-              <Media :item="itemEdit" @imageClicked="$emit('mediaModalToggle', { item: $event.item, show: true })"></Media>
+              <Media :item="itemEdit" @imageClicked="$emit('mediaModalToggle', { item: $event.item, show: true })" @mediaChange="onMediaChange" @mediaReset="onMediaReset"></Media>
             </v-col>
           </v-row>
         </form>
@@ -149,6 +149,7 @@
     },
     data: () => ({
       itemEdit: null,
+      mediaFile: null,
       optionsVisibility: [
         {
           text: 'HIDDEN',
@@ -197,6 +198,17 @@
       test1(e) {
         console.log(e)
         // $emit('mediaModalToggle', { item, show: true })
+      },
+      onMediaChange({ item, file }) {
+        this.mediaFile = file
+        this.itemEdit = { ...this.itemEdit, ...item }
+      },
+      onMediaReset() {
+        const { content_media, content_media_type } = this.item
+        console.log(content_media)
+        console.log(content_media_type)
+        this.mediaFile = null
+        this.itemEdit = { ...this.itemEdit, content_media, content_media_type }
       },
       onUpdateSchedule({ end, start }) {
         const [endDate, endTime] = end.split(' ')

@@ -1,5 +1,5 @@
 <template>
-  <v-img :src="src" max-width="100%" contain @click="$emit('imageClicked', { item })"></v-img>
+  <v-img :src="src" contain @click="$emit('imageClicked', { item })"></v-img>
 </template>
 
 <script>
@@ -20,9 +20,11 @@
         return
       },
       src() {
-        return this.item.content_media_type === 'url' ? this.item.content_media : `${this.$api.mediaUrl}${this.item.content_media}`
+        const isUrl = this.item.content_media.includes('/')
+        return this.item.content_media_type === 'image_url' ? this.item.content_media : `${this.$api.mediaUrl}${this.item.content_media}`
       },
     },
+    methods: {},
   }
 </script>
 

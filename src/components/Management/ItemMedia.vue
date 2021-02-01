@@ -25,7 +25,18 @@
                 <v-col cols="6" d-flex flex-column justify-start>
                   <v-select v-model="typeSelect" label="Source" :items="typeOptions"></v-select>
                   <v-text-field v-if="typeSelect === 'URL'" label="Url" prepend-icon="mdi-link"></v-text-field>
-                  <v-file-input v-else v-model="file" ref="fileInput" label="File" prepend-icon="mdi-image-plus" @change="onFileInputChange"></v-file-input>
+                  <v-text-field
+                    v-else
+                    :value="file && file.name ? file.name : item.content_media"
+                    clearable
+                    :clear-icon="file && file.name ? 'mdi-undo' : 'mdi-close'"
+                    label="File"
+                    prepend-icon="mdi-image-plus"
+                    readonly
+                    @click:clear="onClearFileInput"
+                    @click="$refs.fileInput.$refs.input.click() || null"
+                  ></v-text-field>
+                  <v-file-input v-show="false" v-model="file" ref="fileInput" label="File" :messages="item.content_media || ''" @change="onFileInputChange"></v-file-input>
                 </v-col>
                 <v-col cols="6">
                   <v-card v-if="!previewSrc" flat height="100%" width="100%" class="d-flex flex-column align-center justify-space-around">
@@ -33,7 +44,18 @@
                       <v-icon color="grey" x-large>mdi-image-plus</v-icon>
                     </v-btn>
                   </v-card>
-                  <ItemImage v-else :item="item" @imageClicked="$emit('imageClicked', $event)"></ItemImage>
+                  <v-hover v-else>
+                    <template v-slot:default="{ hover }">
+                      <v-card flat @click="$emit('imageClicked', { item })" width="100%" height="200" class="d-flex align-center justify-center">
+                        <ItemImage :item="item" @imageClicked="$emit('imageClicked', $event)"></ItemImage>
+                        <v-fade-transition>
+                          <v-overlay v-if="hover" absolute color="primary" opacity=".5">
+                            <v-icon color="secondary" x-large>mdi-eye</v-icon>
+                          </v-overlay>
+                        </v-fade-transition>
+                      </v-card>
+                    </template>
+                  </v-hover>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -42,7 +64,7 @@
         <v-tab-item value="video">
           <v-card flat>
             <v-card-text>
-              <v-row v-if="!fileinputUrl">
+              <v-row v-if="!inputUrl">
                 <v-col cols="6" class="d-flex flex-column justify-start">INPUT</v-col>
                 <v-col cols="6">PREVIEW</v-col>
               </v-row>
@@ -80,7 +102,8 @@
     },
     data: () => ({
       file: null,
-      fileinputUrl: null,
+      inputName: null,
+      inputUrl: null,
       tab: 0,
       tabs: [
         {
@@ -114,8 +137,8 @@
       },
       previewSrc() {
         switch (true) {
-          case this.fileinputUrl:
-            return { ...this.item, media_content: this.fileinputUrl, media_content_type: 'url' }
+          case this.inputUrl:
+            return { ...this.item, media_content: this.inputUrl, media_content_type: 'url' }
             break
           case this.item?.content_media_type === 'image' || this.item?.content_media_type === 'image_url':
             return this.item
@@ -129,6 +152,16 @@
     },
     methods: {
       onClearFileInput() {
+        if (this.inputUrl) {
+          this.$emit('mediaReset')
+          this.$nextTick(() => {
+            this.file = null
+            this.inputUrl = null
+          })
+        } else {
+          this.$emit('mediaChange', { item: { content_media: null, content_media_type: null } })
+        }
+
         //if file
         //revert to original item
         //clear this.file
@@ -137,8 +170,12 @@
       },
       onFileInputChange(file) {
         if (file) {
-          this.fileinputUrl = URL.createObjectURL(file)
+          console.log(file)
+          console.log(this.file)
+          console.log(this.file.name)
+          this.inputUrl = URL.createObjectURL(file)
           URL.revokeObjectURL(file)
+          this.$emit('mediaChange', { item: { content_media: this.inputUrl, content_media_type: 'image_url' }, file: this.file })
         }
       },
     },

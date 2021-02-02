@@ -42,7 +42,7 @@
       <v-btn icon class="mx-0" @click="$emit('itemEdit', item)">
         <v-icon color="teal">mdi-pencil</v-icon>
       </v-btn>
-      <v-btn icon class="mx-0" @click="deleteItem(item)">
+      <v-btn icon class="mx-0" @click="$emit('itemDelete', item)">
         <v-icon color="pink">mdi-delete</v-icon>
       </v-btn>
     </td>

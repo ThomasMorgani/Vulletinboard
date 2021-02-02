@@ -50,14 +50,28 @@
       >
         <template v-slot:body="{ items }">
           <tbody>
-            <Row v-for="item in items" :key="item.id" :item="item" @itemEdit="onItemEdit" @mediaModalToggle="onMediaModalToggle" @visibilityToggle="onVisibilityToggle"></Row>
+            <Row
+              v-for="item in items"
+              :key="item.id"
+              :item="item"
+              @itemDelete="onItemDelete"
+              @itemEdit="onItemEdit"
+              @mediaModalToggle="onMediaModalToggle"
+              @visibilityToggle="onVisibilityToggle"
+            ></Row>
           </tbody>
         </template>
         <template slot="no-data">
           <v-btn color="primary" @click="initialize">Reset</v-btn>
         </template>
       </v-data-table>
-      <ItemModal :key="modalItem.item.id + '' + modalItem.show" v-bind="{ ...modalItem, itemDefault }" @mediaModalToggle="onMediaModalToggle" @close="onItemEditClose"></ItemModal>
+      <ItemModal
+        :key="modalItem.item.id + '' + modalItem.show"
+        v-bind="{ ...modalItem, itemDefault }"
+        @close="onItemEditClose"
+        @itemDelete="itemDelete"
+        @mediaModalToggle="onMediaModalToggle"
+      ></ItemModal>
       <MediaModal v-bind="modalMedia" @mediaModalToggle="onMediaModalToggle" @input="modalMedia.show = $event"></MediaModal>
     </v-card-text>
   </v-card>
@@ -166,6 +180,7 @@
       modalItem: {
         item: {},
         show: false,
+        showDelete: false,
       },
       modalMedia: {
         item: {},
@@ -324,6 +339,7 @@
       },
       itemDelete(id) {
         this.items = this.items.filter(item => item.id !== id)
+        this.onItemEditClose()
       },
       itemSave(item) {
         console.log('events: save item ')
@@ -336,6 +352,9 @@
       onFilterToggle(filter) {
         this.filters[filter].value = !this.filters[filter].value
       },
+      onItemDelete(item) {
+        this.modalItem = { item: { ...this.itemDefault, ...item }, show: true, showDelete: true }
+      },
       onItemEdit(item) {
         this.modalItem = { item: { ...this.itemDefault, ...item }, show: true }
       },
@@ -343,7 +362,7 @@
         this.modalItem = { item: this.itemDefault, show: false }
       },
       onMediaModalToggle(content) {
-        console.log(content)
+        // console.log(content)
         this.modalMedia = { ...content }
       },
       onVisibilityToggle(item) {

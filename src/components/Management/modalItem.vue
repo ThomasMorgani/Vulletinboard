@@ -171,6 +171,10 @@
         type: Boolean,
         default: () => false,
       },
+      showDelete: {
+        type: Boolean,
+        default: () => false,
+      },
     },
     components: {
       Media,
@@ -238,7 +242,7 @@
             if (resp?.data) {
               const { data, message, status } = resp.data
               if (status === 'success') {
-                //emit itemDelete
+                this.$emit('itemDelete', this.item.id)
               }
               //snackbar
             }
@@ -254,8 +258,6 @@
       },
       onMediaReset() {
         const { content_media, content_media_type } = this.item
-        console.log(content_media)
-        console.log(content_media_type)
         this.mediaFile = null
         this.itemEdit = { ...this.itemEdit, content_media, content_media_type }
       },
@@ -282,7 +284,6 @@
       },
     },
     created() {
-      console.log(this.item)
       const states = ['isScheduleActive', 'isScheduleExpired', 'isSchedulePending']
       let isScheduled = false
       this.itemEdit = { ...this.item } || { ...this.itemDefault }
@@ -298,8 +299,10 @@
       })
       if (isScheduled) {
         this.scheduled = true
-        this.scheduledFirst = true
+        this.scheduledFirst = false
       }
+
+      setTimeout(() => (this.modalDelete = this.showDelete), 500)
     },
   }
 </script>

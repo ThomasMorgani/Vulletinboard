@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-card-title class="pt-2">
+    <v-card-title class="pt-2 px-0">
       <v-row align="center">
         <v-col cols="6" class="text-left">
           <h2 class="title font-weight-bold primary--text">Media</h2>
@@ -13,7 +13,7 @@
         </v-col>
       </v-row>
     </v-card-title>
-    <v-card-text>
+    <v-card-text class="px-0">
       <v-tabs-items v-model="tab">
         <v-tab-item value="image">
           <v-card flat>

@@ -143,7 +143,7 @@
         <v-btn text color="primary" @click="$emit('close')">
           Cancel
         </v-btn>
-        <v-btn text color="success" @click="$emit('save')" class="font-weight-bold">
+        <v-btn text color="success" @click="itemSave" class="font-weight-bold">
           Save
         </v-btn>
       </v-card-actions>
@@ -251,6 +251,21 @@
       },
       itemSave() {
         console.log('save item')
+        let postData = new FormData()
+        for (let key in this.itemEdit) {
+          postData.append(key, this.itemEdit[key])
+        }
+        postData.append('mediaFile', this.mediaFile)
+        // const postData = { ...this.itemEdit, mediaFile: this.mediaFile }
+        this.$http
+          .post(`${this.$api.apiUrl}item_update/${this.item.id}`, postData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then(response => {
+            console.log(response)
+          })
       },
       onMediaChange({ item, file }) {
         this.mediaFile = file

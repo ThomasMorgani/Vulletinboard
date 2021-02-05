@@ -30,7 +30,7 @@
         </v-col>
         <v-col>
           <v-card flat height="8rem" max-height="8rem" class="d-flex align-content-space-between flex-wrap">
-            <v-btn block color="primary"> <v-icon left>mdi-plus </v-icon> ADD NEW </v-btn>
+            <v-btn block color="primary" @click="itemNew"> <v-icon left>mdi-plus </v-icon> ADD NEW </v-btn>
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details clearable> </v-text-field>
           </v-card>
         </v-col>
@@ -39,11 +39,11 @@
     <v-card-text>
       <v-data-table
         :loading="loading"
-        :headers="headers"
+        :headers="tableHeaders"
         :items="itemsList"
         :search="search"
         hide-default-footer
-        :options="{ itemsPerPage: 10000 }"
+        :options.sync="tableOptions"
         height="65vh"
         fixed-header
         class="elevation-1 mt-2"
@@ -70,10 +70,20 @@
         v-bind="{ ...modalItem, itemDefault }"
         @close="onItemEditClose"
         @itemDelete="itemDelete"
+        @itemSave="itemSave"
         @mediaModalToggle="onMediaModalToggle"
       ></ItemModal>
       <MediaModal v-bind="modalMedia" @mediaModalToggle="onMediaModalToggle" @input="modalMedia.show = $event"></MediaModal>
     </v-card-text>
+    <v-snackbar v-model="snackbar.value" v-bind="snackbar.options" content-class="font-weight-bold">
+      {{ snackbar.message }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn icon v-bind="attrs" @click="snackbar.value = false">
+          <v-icon :color="snackbar.options.color"> mdi-close </v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -116,7 +126,52 @@
           value: false,
         },
       },
-      headers: [
+      itemDefault: {
+        content_desc: null,
+        content_type: null,
+        content_scheduled_date: null,
+        content_title: null,
+        content_media: null,
+        content_media_type: null,
+        content_date: null,
+        created_by: null,
+        created_on: null,
+        event_date: null,
+        event_time: null,
+        id: null,
+        visible: true,
+        scheduleEnd: null,
+        scheduleStart: null,
+      },
+      items: [],
+      loading: true,
+      modalDelete: {
+        show: false,
+      },
+      modalItem: {
+        item: {},
+        show: false,
+        showDelete: false,
+      },
+      modalMedia: {
+        item: {},
+        show: false,
+      },
+      search: null,
+      snackbar: {
+        options: {
+          app: true,
+          centered: true,
+          color: '',
+          outlined: true,
+          text: true,
+          timeout: 2500,
+          top: true,
+        },
+        message: '',
+        value: false,
+      },
+      tableHeaders: [
         {
           text: 'TITLE',
           align: 'start',
@@ -155,38 +210,16 @@
         },
         { text: '', value: 'visible', align: 'end', sortable: false },
       ],
-      itemDefault: {
-        content_desc: null,
-        content_type: null,
-        content_scheduled_date: null,
-        content_title: null,
-        content_media: null,
-        content_media_type: null,
-        content_date: null,
-        created_by: null,
-        created_on: null,
-        event_date: null,
-        event_time: null,
-        id: null,
-        visible: true,
-        scheduleEnd: null,
-        scheduleStart: null,
+      tableOptions: {
+        groupBy: [],
+        groupDesc: [],
+        itemsPerPage: 10000,
+        multiSort: false,
+        mustSort: false,
+        page: 1,
+        sortBy: ['content_title'],
+        sortDesc: [false],
       },
-      items: [],
-      loading: true,
-      modalDelete: {
-        show: false,
-      },
-      modalItem: {
-        item: {},
-        show: false,
-        showDelete: false,
-      },
-      modalMedia: {
-        item: {},
-        show: false,
-      },
-      search: null,
       tabs: null,
     }),
     computed: {
@@ -339,10 +372,18 @@
       },
       itemDelete(id) {
         this.items = this.items.filter(item => item.id !== id)
+        this.toggleSnackbar('error', 'Item Deleted', true)
         this.onItemEditClose()
+      },
+      itemNew() {
+        this.modalItem = { item: { ...this.itemDefault }, show: true }
       },
       itemSave(item) {
         console.log('events: save item ')
+        console.log(item)
+        this.toggleSnackbar('success', 'Item Saved', true)
+        this.items = [...this.items.filter(i => i.id !== item.id), { ...item }]
+        this.modalItem = { item: { ...this.itemDefault }, show: false }
       },
       onFiltersClear() {
         for (let filter in this.filters) {
@@ -402,6 +443,11 @@
               return { icon: '', color: '', tooltip: '' }
           }
         }
+      },
+      toggleSnackbar(color, message, value) {
+        this.snackbar.options.color = color
+        this.snackbar.message = message
+        this.snackbar.value = value
       },
     },
     created() {

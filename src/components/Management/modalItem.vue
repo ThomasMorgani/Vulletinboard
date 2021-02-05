@@ -8,10 +8,18 @@
         <form action="">
           <v-row align="center" justify="center">
             <v-col cols="12">
-              <v-text-field type="text" label="Title" v-model="itemEdit.content_title" color="primary"></v-text-field>
+              <v-text-field
+                v-model="itemEdit.content_title"
+                clearable
+                color="primary"
+                :error-messages="itemEdit.content_title ? null : 'Required'"
+                label="Title"
+                required
+                type="text"
+              ></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field type="text" label="Description" v-model="itemEdit.content_desc" color="primary"></v-text-field>
+              <v-text-field v-model="itemEdit.content_desc" clearable color="primary" label="Description" type="text"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="d-flex justify-center">
               <v-dialog ref="modalEventdate" v-model="modalEventdate" :return-value.sync="itemEdit.event_date" persistent width="290px">
@@ -63,7 +71,7 @@
               </v-dialog>
             </v-col>
             <v-col cols="6">
-              <v-select label="Visible" :items="optionsVisibility" v-model="itemEdit.visible" color="primary">
+              <v-select label="Visibility" :items="optionsVisibility" v-model="itemEdit.visible" color="primary">
                 <!-- <template #selection="{item}">
                   <v-icon left :color="item.color">{{ item.icon }}</v-icon>
                   <span class="font-weight-bold font-size-medium">
@@ -116,7 +124,7 @@
       <v-card-actions>
         <v-dialog v-model="modalDelete" persistent width="300">
           <template #activator="{attrs, on}">
-            <v-btn v-bind="attrs" v-on="on" text color="error">
+            <v-btn v-bind="attrs" v-on="on" :disabled="!itemEdit.id" text color="error">
               Delete
             </v-btn>
           </template>
@@ -143,9 +151,16 @@
         <v-btn text color="primary" @click="$emit('close')">
           Cancel
         </v-btn>
-        <v-btn text color="success" @click="itemSave" class="font-weight-bold">
-          Save
-        </v-btn>
+        <v-tooltip color="error" :disabled="!savebtnMessage" top>
+          <template #activator="{ on, attrs }">
+            <div v-bind="attrs" v-on="on">
+              <v-btn color="success" :disabled="savebtnMessage !== null" text @click="itemSave" class="font-weight-bold">
+                Save
+              </v-btn>
+            </div>
+          </template>
+          <p>{{ savebtnMessage }}</p>
+        </v-tooltip>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -213,6 +228,18 @@
           return formats.dateHuman(this.itemEdit.event_date)
         }
       },
+      savebtnMessage() {
+        //test changes
+        //test required
+        const required = ['title', 'content_media']
+        let message = null
+        required.forEach(req => {
+          if (this.itemEdit[req] === null) {
+            message = 'Please check required fields'
+          }
+        })
+        return message
+      },
       scheduleDetail() {
         if (!this.itemEdit.user_friendly_scheduleEnd && !this.itemEdit.user_friendly_scheduleStart) {
           return 'Schedule not set'
@@ -237,7 +264,7 @@
         console.log('delete item')
         this.btnLoading = 'delete'
         this.$http
-          .get(`${this.$api.apiUrl}item_delete/${this.item.id}`)
+          .get(`${this.$api.apiUrl}manage/bulletinboard/delete/${this.item.id}`)
           .then(resp => {
             if (resp?.data) {
               const { data, message, status } = resp.data
@@ -258,13 +285,17 @@
         postData.append('mediaFile', this.mediaFile)
         // const postData = { ...this.itemEdit, mediaFile: this.mediaFile }
         this.$http
-          .post(`${this.$api.apiUrl}item_update/${this.item.id}`, postData, {
+          .post(`${this.$api.apiUrl}manage/bulletinboard/update/`, postData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           })
-          .then(response => {
-            console.log(response)
+          .then(resp => {
+            console.log(resp)
+            const { data, message, status } = resp.data
+            if (status === 'success') {
+              this.$emit('itemSave', data)
+            }
           })
       },
       onMediaChange({ item, file }) {

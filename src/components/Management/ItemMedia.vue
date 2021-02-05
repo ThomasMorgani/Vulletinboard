@@ -8,7 +8,7 @@
         <v-col cols="6">
           <v-tabs v-model="tab" color="primary" centered height="40">
             <v-tabs-slider></v-tabs-slider>
-            <v-tab v-for="tab in tabs" :key="tab.value" :href="`#${tab.value}`"> <v-icon v-text="tab.icon"></v-icon> </v-tab>
+            <v-tab v-for="tab in tabs" :key="tab.value" :disabled="tab.disabled" :href="`#${tab.value}`"> <v-icon v-text="tab.icon"></v-icon> </v-tab>
           </v-tabs>
         </v-col>
       </v-row>
@@ -27,10 +27,11 @@
                   <v-text-field
                     v-if="typeSelect === 'URL'"
                     clearable
+                    :error-messages="!item.content_media ? 'Required' : null"
                     label="Url"
                     prepend-icon="mdi-link"
                     ref="urlInput"
-                    @change="onUrlInputChange"
+                    @input="onUrlInputChange($event)"
                     @click:clear="onClearFileInput"
                   ></v-text-field>
                   <v-text-field
@@ -38,6 +39,7 @@
                     :value="file && file.name ? file.name : item.content_media"
                     clearable
                     :clear-icon="file && file.name ? 'mdi-undo' : 'mdi-close'"
+                    :error-messages="file === null && item.content_media === null ? 'Required' : null"
                     label="File"
                     prepend-icon="mdi-image-plus"
                     readonly
@@ -115,20 +117,23 @@
       tab: 0,
       tabs: [
         {
-          label: 'Image',
+          disabled: false,
           icon: 'mdi-image',
+          label: 'Image',
           value: 'image',
         },
 
         {
-          label: 'Video',
+          disabled: true,
           icon: 'mdi-filmstrip',
+          label: 'Video',
           value: 'video',
         },
 
         {
-          label: 'Text',
+          disabled: true,
           icon: 'mdi-format-text',
+          label: 'Text',
           value: 'text',
         },
       ],
@@ -194,6 +199,7 @@
       },
       onUrlInputChange(url) {
         if (url) {
+          console.log('xx')
           console.log(url)
           // this.inputUrl = URL.createObjectURL(file)
           // URL.revokeObjectURL(file)

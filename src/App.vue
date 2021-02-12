@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
+    <Header></Header>
     <v-main>
-      <Header></Header>
       <router-view />
     </v-main>
     <Ticker v-if="$route.name === 'Bulletinboard'"></Ticker>

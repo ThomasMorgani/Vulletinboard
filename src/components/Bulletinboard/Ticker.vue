@@ -1,15 +1,15 @@
 <template>
-  <v-toolbar bottom flat height="43" color="primary">
-    <div class="headline secondary--text d-flex align-center text-no-wrap">
+  <v-app-bar app bottom color="primary" height="70" class="d-flex align-center">
+    <div class="headline secondary--text text-no-wrap">
       {{ time }}
     </div>
     <v-divider vertical dark class="px-2"></v-divider>
     <v-icon class="flex-shrink-1 px-4" color="white">mdi mdi-newspaper</v-icon>
 
-    <div class="newsFeedDiv flex-grow-1  flex-shrink-0">
+    <div class="newsFeedDiv">
       <!-- <font class="text-white headline pr-1">HEADLINES:</font> -->
       <span class="marquee">
-        <p class="marquee-text pt-2">{{ newsfeed }}</p>
+        <p class="marquee-text  mb-0">{{ newsfeed }}</p>
       </span>
     </div>
     <div id="weatherDiv" v-if="this.weatherData != ''">
@@ -18,7 +18,7 @@
       </p>
       <img class="weatherIcon" v-bind:src="this.weatherIcon" />
     </div>
-  </v-toolbar>
+  </v-app-bar>
 </template>
 
 <script>
@@ -111,8 +111,8 @@
   }
 
   .marquee {
+    height: 100%;
     width: 100%;
-    line-height: 35px;
     /*background-color: Pink;*/
 
     white-space: nowrap;

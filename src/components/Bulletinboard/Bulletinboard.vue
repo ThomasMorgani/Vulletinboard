@@ -1,33 +1,24 @@
 <template>
-  <v-container fluid class="mainContainer">
-    <v-row wrap align-center ref="mainRow" >
+  <v-sheet :color="background" height="100%" width="100%" class="d-flex flex-no-wrap align-start justify-start">
     <!--EVENT LIST -->
-      <v-col cols="4" class="pa-0" >
-        <EventList :articles="articles" @showNextEvent="showNextEvent"></EventList>
-      </v-col cols="4">
+    <EventList :articles="articles" @showNextEvent="showNextEvent" @selectItem="itemSelect"></EventList>
     <!--IMAGE -->
-      <v-col cols="8" class="text-center">
-        <v-slide-x-transition leave-absolute>
-          <EventImage :key="displayedEventImage" :image="displayedEventImage"></EventImage>
-        </v-slide-x-transition>
-      </v-col>
-    </v-row>
-  </v-container>
+    <EventImage :key="displayedEventImage" :image="displayedEventImage" class="d-flex flex-grow-1 flex-shrink-0"></EventImage>
+  </v-sheet>
 </template>
 
 <script>
-  import {seedData} from '@/assets/store/data.js'
-  const {articles:articlesData, settings:appSettings} = seedData
+  import { seedData } from '@/assets/store/data.js'
+  const { articles: articlesData, settings: appSettings } = seedData
 
+  import EventList from '@/components/Bulletinboard/Eventlist'
+  import EventImage from '@/components/Bulletinboard/Eventimage'
 
-  import EventList from '@/components/Bulletinboard/Eventlist'  
-  import EventImage from '@/components/Bulletinboard/Eventimage'  
-    
   export default {
     name: 'Bulletinboard',
-    components: { 
+    components: {
       EventList,
-      EventImage
+      EventImage,
     },
     data: () => ({
       activeEvent: 0,
@@ -36,76 +27,53 @@
         height: 0,
         width: 0,
       },
-      articleTimer: 7000,
-      initialEventCount: 2,
+      articleTimer: 8000,
+      background: 'grey',
       intervalId: null,
-      isMounted: false,
-
     }),
+    computed: {
+      displayedEventImage() {
+        return this.articles?.['0']?.content_media
+      },
+    },
     methods: {
       async getArticles() {
         //fetch articles here
         console.log(articlesData)
         return [...articlesData] || []
       },
+      itemSelect(item) {
+        const el = this.$el.getElementsByClassName('eventTop')[0]
+        if (el) {
+          el.scrollIntoView(true, { behavior: 'smooth' })
+        }
 
+        this.articles = [item, ...this.articles.filter(i => i.id != item.id)]
+        this.resetInterval(this.showNextEvent, this.articleTimer)
+      },
+      resetInterval(cb, time) {
+        if (this.intervalId) {
+          clearInterval(this.intervalId)
+        }
+        this.intervalId = setInterval(cb, time)
+      },
       selectEvent(id) {
         this.activeEvent = id
       },
-
       showNextEvent() {
         if (Array.isArray(this.articles)) {
-          const article = this.articles.shift()
-          this.articles.push(article)
+          const articles = [...this.articles]
+          articles.push(articles.shift())
+          this.articles = [...articles]
         }
         return
-        //TODO: DELETE, CONFIRM NOT NEEDED
-        if (parseInt(this.activeEvent) < this.articles.length - 1) {
-          this.activeEvent++
-          currentelement = 'listItem' + this.activeEvent
-          element = document.getElementById(currentelement)
-          console.log(element)
-          if (!element) return
-          if (this.activeEvent % 2 === 0) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          }
-          //TESTING INFINITE SCROLL
-          // if (this.$refs.eventList.$el.scrollTop > 0) {
-          //   console.log('push')
-          //   this.eventList.push(this.eventList.shift())
-          // }
-        } else if (parseInt(this.activeEvent) >= this.articles.length - 1) {
-          // this.$http.get('https://eipl.org/bulletinboard/?getarticles=true').then(
-          //         function(data){ this.setData(data)} ).then(
-          //             function(){this.showSelectedEvent("0")}).then(
-          //                 function(){var currentelement = 'listItem' + this.displayedArticle
-          //                     .scrollIntoView()})
-          this.activeEvent = 0
-          currentelement = 'listItem' + this.activeEvent
-          element = document.getElementById(currentelement)
-          if (!element) return
-          element.scrollIntoView({ behavior: 'smooth' })
-        } else {
-          //console.log('error')
-        }
       },
     },
-    computed: {
-      displayedEventImage: function() {
-        return this.articles && this.activeEvent ? this.articles[this.activeEvent]['content_media'] : ''
-      },
-    },
-    created() {
-      console.log(articlesData)
-      // console.log(articles)
-    },
-    async mounted() {
+
+    async created() {
       this.articles = await this.getArticles()
+      this.resetInterval(this.showNextEvent, this.articleTimer)
       return
-      if (this.articles) {
-        this.initialEventCount = this.articles.length
-        this.intervalId = setInterval(this.showNextEvent, this.articleTimer)
-      }
     },
     beforeDestroy() {
       clearInterval(this.intervalId)
@@ -113,10 +81,4 @@
   }
 </script>
 
-<style scoped>
-  .container {
-    padding: .25em 1em;
-  }
-
-  
-</style>
+<style scoped></style>

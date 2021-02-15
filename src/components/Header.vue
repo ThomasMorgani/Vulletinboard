@@ -1,14 +1,14 @@
 <template>
-  <v-app-bar app text color="primary" min-height="1" height="80" max-height="105">
+  <v-app-bar app text color="primary" min-height="1" height="80" max-height="105" @mouseenter="menuShow = !menuShow" @mouseleave="menuShow = !menuShow">
     <v-toolbar-title @click="menuShow = !menuShow" v-text="title" class="secondary--text logo"></v-toolbar-title>
     <!-- <template v-slot:img="{ props }">
       <v-img v-bind="props" contain position="left center" height="100%" min-height="100%" class="banner"></v-img>
     </template> -->
     <v-spacer></v-spacer>
-    <v-toolbar-items v-show="menuShow">
+    <v-toolbar-items v-if="menuShow" transition="scroll-y-transition">
       <!-- <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn> -->
       <v-btn text class="secondary--text" exact :to="{ name: 'Bulletinboard' }"> <v-icon left>mdi-pin</v-icon>Bulletinboard </v-btn>
-      <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Manage Content </v-btn>
+      <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Content </v-btn>
       <v-btn text class="secondary--text"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
       <v-menu bottom offset-y>
         <template v-slot:activator="{ on, attrs }">

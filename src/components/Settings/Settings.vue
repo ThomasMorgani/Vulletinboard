@@ -1,5 +1,5 @@
 <template>
-  <v-card flat height="8rem" max-height="8rem">
+  <v-card flat height="8rem" max-height="8rem" class="mx-4">
     <v-card-title>
       <v-row>
         <v-col cols="8">
@@ -9,18 +9,20 @@
           </v-tabs>
         </v-col>
         <v-col cols="4" class="d-flex align-center">
-          <v-btn block color="success"> <v-icon left>mdi-content-save</v-icon>SAVE </v-btn>
+          <!-- <v-btn block color="success"> <v-icon left>mdi-content-save</v-icon>SAVE </v-btn> -->
         </v-col>
       </v-row>
     </v-card-title>
-    <v-tabs-items v-model="tabs">
-      <v-tab-item key="settings">
-        <v-sheet color="transparent" height="100%" class="d-flex">
-          <ContentSettings></ContentSettings>
-        </v-sheet>
-      </v-tab-item>
-      <v-tab-item key="users" disabled>USERS </v-tab-item>
-    </v-tabs-items>
+    <v-card-text class="content">
+      <v-tabs-items v-model="tabs">
+        <v-tab-item key="settings">
+          <v-sheet color="transparent" height="100%" class="d-flex">
+            <ContentSettings></ContentSettings>
+          </v-sheet>
+        </v-tab-item>
+        <v-tab-item key="users" disabled>USERS </v-tab-item>
+      </v-tabs-items>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -35,4 +37,9 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .content {
+    height: 80vh;
+    overflow-y: scroll;
+  }
+</style>

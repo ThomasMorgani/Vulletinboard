@@ -1,6 +1,6 @@
 <template>
-  <v-card class="">
-    <v-card-title class="title-text primary--text">
+  <v-card outlined class="">
+    <v-card-title class="text-h5 primary--text">
       {{ setting.label }}
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">
@@ -8,12 +8,20 @@
         {{ setting.description }}
       </p>
       <v-sheet class="d-flex align-center justify-space-around">
-        <v-text-field color="primary" type="number" v-model="timeout" class="mx-2"></v-text-field>
+        <v-text-field
+          v-model="timeout"
+          color="primary"
+          :error-messages="!timeoutVal || timeoutVal < 1 ? 'must be greater than 0' : null"
+          min="1"
+          type="number"
+          class="mx-2"
+        ></v-text-field>
         <v-select color="primary" v-model="metric" :items="metricOptions" class="mx-2"></v-select>
       </v-sheet>
     </v-card-text>
     <v-card-actions>
-      <v-btn text color=""> </v-btn>
+      <v-btn tile color="success" :disabled="setting.value === timeoutVal || timeoutVal < 1" width="150">SAVE </v-btn>
+      <v-btn tile color="warning" :disabled="setting.value === timeoutVal" @click="timeoutVal = setting.value">REVERT </v-btn>
     </v-card-actions>
   </v-card>
 </template>

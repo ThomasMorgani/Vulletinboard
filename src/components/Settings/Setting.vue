@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-card-title class="title-text primary--text">
+    <v-card-title class="text-h4 primary--text">
       {{ setting.name }}
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">

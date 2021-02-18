@@ -8,7 +8,7 @@
   </v-app>
 </template>
 <script>
-  import Header from '@/components/Header'
+  import Header from '@/components/Layout/Header'
   import Ticker from '@/components/Bulletinboard/Ticker'
   export default {
     name: 'Vulletinboard',

@@ -15,6 +15,11 @@ const routes = [
     name: 'Manage',
     component: () => import(/* webpackChunkName: "mgmt" */ '@/components/Management/Management.vue'),
   },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import(/* webpackChunkName: "settings" */ '@/components/Settings/Settings.vue'),
+  },
 ]
 
 const router = new VueRouter({

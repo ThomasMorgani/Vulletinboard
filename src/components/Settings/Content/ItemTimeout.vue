@@ -21,7 +21,7 @@
     </v-card-text>
     <v-card-actions>
       <v-btn tile color="success" :disabled="setting.value === timeoutVal || timeoutVal < 1" width="150">SAVE </v-btn>
-      <v-btn tile color="warning" :disabled="setting.value === timeoutVal" @click="timeoutVal = setting.value">REVERT </v-btn>
+      <v-btn tile color="warning" :disabled="setting.value === timeoutVal" @click="revertSetting">REVERT </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -64,6 +64,26 @@
             break
         }
       },
+      revertSetting() {
+        this.timeoutVal = this.setting.value
+        this.setUnit()
+      },
+      setUnit() {
+        const timeout = this.timeoutVal
+        switch (true) {
+          case timeout < 60000:
+            this.metric = 'seconds'
+            break
+          case time >= 60000 && time < 3600000:
+            this.metric = 'minutes'
+            break
+          case time >= 3600000:
+            this.metric = 'hours'
+            break
+          default:
+            break
+        }
+      },
       toMilliseconds(val) {
         switch (this.metric) {
           case 'seconds':
@@ -80,6 +100,7 @@
     },
     mounted() {
       this.timeoutVal = this.setting.value
+      this.setUnit()
     },
   }
 </script>

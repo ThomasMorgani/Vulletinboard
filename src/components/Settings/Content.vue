@@ -6,8 +6,16 @@
     <v-card-text v-if="!isLoading">
       <!-- <Setting v-for="setting in settings" :key="setting.id" :setting="setting"></Setting> -->
       <Background :setting="settings.backgroundColor" width="100%" class="my-1"></Background>
+      <Header
+        :headerColor="settings.headerColor"
+        :headerShow="settings.headerShow"
+        :headerType="settings.headerType"
+        :headerContent="settings.headerContent"
+        width="100%"
+        class="my-1"
+      ></Header>
       <ItemTimeout :setting="settings.itemTimeout" class="my-1"></ItemTimeout>
-      <Ticker :tickerFeed="settings.tickerFeed" :tickerFilter="settings.tickerFilter" :tickerSpeed="settings.tickerSpeed" class="my-1"></Ticker>
+      <Ticker :tickerFeed="settings.tickerFeed" :tickerFilter="settings.tickerFilter" :tickerShow="settings.tickerShow" :tickerSpeed="settings.tickerSpeed" class="my-1"></Ticker>
     </v-card-text>
   </v-card>
 </template>
@@ -15,12 +23,13 @@
 <script>
   // import Setting from '@/components/Settings/Setting'
   import Background from '@/components/Settings/Content/Background'
+  import Header from '@/components/Settings/Content/Header'
   import ItemTimeout from '@/components/Settings/Content/ItemTimeout'
   import Ticker from '@/components/Settings/Content/Ticker'
 
   export default {
     name: 'ContentSettings',
-    components: { Background, ItemTimeout, Ticker },
+    components: { Background, Header, ItemTimeout, Ticker },
     data: () => ({
       isLoading: true,
       settings: {},

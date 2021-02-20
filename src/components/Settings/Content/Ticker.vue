@@ -6,14 +6,29 @@
     <v-card-text class="d-flex flex-column align-start">
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
+          {{ tickerShow.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ tickerShow.description }}</p>
+          <v-switch color v-model="show" :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" class="mt-0"> </v-switch>
+        </v-card-text>
+      </v-card>
+      <v-card flat width="100%" class="" :disabled="!show">
+        <v-card-title class="text-h5 primary--text">
           {{ tickerFeed.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerFeed.description }}</p>
-          <v-select color v-model="feed" :items="feedOptions"></v-select>
+          <v-select color v-model="feed" :items="feedOptions">
+            <template #append-outer>
+              <v-btn small icon color="primary" :href="feed" target="_blank">
+                <v-icon>mdi-open-in-new</v-icon>
+              </v-btn>
+            </template>
+          </v-select>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
           {{ tickerFilter.label }}
         </v-card-title>
@@ -28,7 +43,7 @@
           </v-combobox>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
           {{ tickerSpeed.label }}
         </v-card-title>
@@ -45,7 +60,9 @@
     </v-card-text>
     <v-card-actions>
       <v-btn tile color="success" :disabled="actionDisabled" width="150">SAVE </v-btn>
-      <v-btn tile color="warning" :disabled="actionDisabled" @click="ticker = setting.value">REVERT </v-btn>
+      <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn tile :disabled="actionDisabled" color="primary" @click="toggleTicker">PREVIEW </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -62,6 +79,10 @@
         type: Object,
         required: true,
       },
+      tickerShow: {
+        type: Object,
+        required: true,
+      },
       tickerSpeed: {
         type: Object,
         required: true,
@@ -71,22 +92,33 @@
       feed: null,
       feedOptions: [
         {
+          id: 1,
           text: 'ABC NEWS',
           value: 'http://abcnews.go.com/abcnews/topstories',
         },
       ],
       filter: [],
+      show: true,
       speed: 200,
     }),
     computed: {
       actionDisabled() {
-        return false
+        return !this.show
+      },
+    },
+    methods: {
+      revertSettings() {
+        this.feed = this.tickerFeed.value
+        this.filter = this.tickerFilter.value ? JSON.parse(this.tickerFilter.value) : []
+        this.show = this.tickerShow.value
+        this.speed = this.tickerSpeed.value
+      },
+      toggleTicker() {
+        console.log('toggle ticker')
       },
     },
     mounted() {
-      this.feed = this.tickerFeed.value
-      this.filter = this.tickerFilter.value
-      this.speed = this.tickerSpeed.value
+      this.revertSettings()
     },
   }
 </script>

@@ -9,7 +9,7 @@
     <div class="newsFeedDiv">
       <!-- <font class="text-white headline pr-1">HEADLINES:</font> -->
       <span class="marquee">
-        <p class="marquee-text  mb-0">{{ newsfeed }}</p>
+        <p class="marquee-text mb-0" :class="marqueeSpeed()">{{ newsfeed }}</p>
       </span>
     </div>
     <div id="weatherDiv" v-if="this.weatherData != ''">
@@ -22,22 +22,24 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
   import RSSParser from 'rss-parser'
   export default {
     data: () => ({
       name: 'ticker',
-      displayedArticle: '',
-      displayedImage: '',
-      displayedNewsItem: 0,
-      displayedNewsItemTitle: '',
       newsfeed: '',
-      newsfeedCount: '',
+      newsfeedCount: 0,
       newsfeedLoading: true,
       time: 'TIME',
       timeInterval: null,
       weatherData: '',
       weatherIcon: '',
     }),
+    computed: {
+      ...mapState({
+        settings: state => state.ticker,
+      }),
+    },
     methods: {
       async getFeed() {
         this.newsfeed = `Herman Cain, former GOP presidential candidate, dies from coronavirus at 74 •  Judge blocks Trump admin's rule barring immigrants who use public benefits •  Army ready to begin broad review at Fort Hood in wake of Guillen murder •  'We will not be leaving' Portland until 'safety' is restored: Trump •  Few medical reasons for not wearing a face mask •  Police: Florida couple jailed for refusing to quarantine •  Another cache of documents related to Ghislaine Maxwell expected to be released •  Trump nominee hearing pulled after furor over Islam remarks •  UK scientists to immunize hundreds with coronavirus vaccine •  Wisconsin governor orders masks statewide amid virus surge •  Russia sentences 2nd ex-US Marine to long jail sentence •  UK rapper Solo 45 sentenced to 24 years for violent rapes •  Trump stokes racist fears after revoking Obama-era housing rule • LIVE:  ABC News Live •  Prosecutor not charging Ferguson officer who killed Michael Brown •  Herman Cain, former GOP presidential candidate, dies from coronavirus at 74 •  Judge blocks Trump admin's rule barring immigrants who use public benefits •  Army ready to begin broad review at Fort Hood in wake of Guillen murder •  'We will not be leaving' Portland until 'safety' is restored: Trump •  Few medical reasons for not wearing a face mask •  Police: Florida couple jailed for refusing to quarantine •  Another cache of documents related to Ghislaine Maxwell expected to be released •  Trump nominee hearing pulled after furor over Islam remarks •  UK scientists to immunize hundreds with coronavirus vaccine •  Wisconsin governor orders masks statewide amid virus surge`
@@ -52,6 +54,17 @@
           console.log('get feed error', err)
         }
         this.newsfeed = await this.parseFeed(feed.items || [])
+      },
+      marqueeSpeed() {
+        const speeds = {
+          1: 'one',
+          2: 'two',
+          3: 'three',
+          4: 'four',
+          5: 'five',
+        }
+        console.log(speeds[this.settings.tickerSpeed] || 'three')
+        return speeds[this.settings.tickerSpeed] || 'three'
       },
       async parseFeed(items = []) {
         const filters = ['WATCH:']
@@ -122,7 +135,31 @@
   .marquee p {
     display: inline-block;
     // padding-left: 100%;
+  }
+  .marquee p.one {
+    display: inline-block;
+    animation: marquee 1000s linear infinite;
+    // padding-left: 100%;
+  }
+  .marquee p.two {
+    display: inline-block;
+    animation: marquee 500s linear infinite;
+    // padding-left: 100%;
+  }
+  .marquee p.three {
+    display: inline-block;
     animation: marquee 300s linear infinite;
+    // padding-left: 100%;
+  }
+  .marquee p.four {
+    display: inline-block;
+    animation: marquee 200s linear infinite;
+    // padding-left: 100%;
+  }
+  .marquee p.five {
+    display: inline-block;
+    animation: marquee 150s linear infinite;
+    // padding-left: 100%;
   }
   .marquee-text {
     color: white;

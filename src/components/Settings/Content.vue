@@ -40,7 +40,7 @@
       },
     },
     async created() {
-      const req = await this.$http.get(`${this.$api.apiUrl}manage/settings`)
+      const req = await this.$http.get(`${API_URL}manage/settings`)
       if (req?.data) {
         this.settings = req.data
       }

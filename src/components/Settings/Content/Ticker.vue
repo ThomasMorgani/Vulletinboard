@@ -50,7 +50,7 @@
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSpeed.description }}</p>
           <v-sheet color="transparent" width="50%" class="mt-4">
-            <v-slider v-model="speed" color="primary" min="10" max="1000" thumb-color="primary" thumb-label="always">
+            <v-slider v-model="speed" color="primary" :max="5" :min="1" step="1" thumb-color="primary" thumb-label="always" ticks="always">
               <template #append>fast</template>
               <template #prepend>slow</template>
             </v-slider>
@@ -99,7 +99,7 @@
       ],
       filter: [],
       show: true,
-      speed: 200,
+      speed: 1,
     }),
     computed: {
       actionDisabled() {

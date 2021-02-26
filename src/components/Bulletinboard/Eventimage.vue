@@ -13,7 +13,7 @@
     props: {
       image: {
         type: String,
-        default: () => 'NO IMAGE PLACEHOLDER',
+        default: () => 'bb_fallback_img.png',
       },
     },
     data: () => ({

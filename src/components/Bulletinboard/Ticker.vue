@@ -1,7 +1,8 @@
 <template>
   <v-app-bar app bottom color="primary" height="70" class="d-flex align-center">
-    <div class="headline secondary--text text-no-wrap">
-      {{ time }}
+    <div class="d-flex flex-column  secondary--text text-no-wrap">
+      <p class="text-subtitle-1 ma-0">{{ date }}</p>
+      <p class="text-h6 ma-0">{{ time }}</p>
     </div>
     <v-divider vertical dark class="px-2"></v-divider>
     <v-icon class="flex-shrink-1 px-4" color="white">mdi mdi-newspaper</v-icon>
@@ -30,6 +31,7 @@
       newsfeed: '',
       newsfeedCount: 0,
       newsfeedLoading: true,
+      date: 'DATE',
       time: 'TIME',
       timeInterval: null,
       weatherData: '',
@@ -98,6 +100,9 @@
         let h = now.getHours()
         let m = now.getMinutes()
         let s = now.getSeconds()
+        let M = now.getMonth() + 1
+        let D = now.getDate()
+        let Y = now.getFullYear()
         let period = 'AM'
 
         if (h > 12) {
@@ -106,6 +111,7 @@
         } else {
           period = h === 12 ? 'PM' : 'AM'
         }
+        this.date = `${M.toString().padStart(2, '0')}/${D.toString().padStart(2, '0')}/${Y}`
         this.time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} ${period}`
       },
     },

@@ -11,7 +11,16 @@ export default new Vuex.Store({
     snackbar: {},
     ticker: {},
   },
-  getters: {},
+  getters: {
+    isAdmin() {
+      //placeholder for when auth is implemented
+      return true
+    },
+    isAuth() {
+      //placeholder for when auth is implemented
+      return true
+    },
+  },
   actions: {
     async apiGet({ commit, state }, endpoint) {
       const { data } = await axios.get(`${API_URL}${endpoint}`)

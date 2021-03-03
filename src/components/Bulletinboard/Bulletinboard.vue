@@ -3,7 +3,9 @@
     <!--EVENT LIST -->
     <EventList v-if="!isLoading" @showNext="itemNext" @showPrevious="itemPrevious" @selectItem="itemSelect"></EventList>
     <!--IMAGE -->
-    <EventImage :key="displayedEventImage" :image="displayedEventImage" class="d-flex flex-grow-1 flex-shrink-0"></EventImage>
+    <transition name="fade" mode="out-in">
+      <EventImage :key="displayedEventImage" :image="displayedEventImage" class="d-flex flex-grow-1 flex-shrink-0"></EventImage>
+    </transition>
   </v-sheet>
 </template>
 
@@ -90,4 +92,16 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped>
+  .fade-enter-active {
+    transition: all 0.3s ease;
+  }
+  .fade-leave-active {
+    transition: all 0.8s cubic-bezier(0.3, 0.5, 0.8, 1);
+  }
+  .fade-enter,
+  .fade-leave-to {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+</style>

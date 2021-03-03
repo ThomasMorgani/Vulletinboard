@@ -5,17 +5,17 @@
       <v-img v-bind="props" contain position="left center" height="100%" min-height="100%" class="banner"></v-img>
     </template> -->
     <v-spacer></v-spacer>
-    <v-toolbar-items v-if="menuShow" transition="scroll-y-transition">
+    <v-toolbar-items v-if="showMenu" transition="scroll-y-transition">
       <!-- <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn> -->
       <v-btn text class="secondary--text" exact :to="{ name: 'Bulletinboard' }"> <v-icon left>mdi-pin</v-icon>Bulletinboard </v-btn>
       <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Content </v-btn>
-      <v-btn text class="secondary--text" :to="{ name: 'Settings' }"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
-      <v-menu bottom offset-y>
+      <v-btn v-if="isAdmin" text class="secondary--text" :to="{ name: 'Settings' }"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
+      <v-menu bottom open-on-hover offset-y v-model="userMenu">
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="secondary" text v-bind="attrs" v-on="on"> <v-icon left>mdi-account-circle</v-icon>Profile </v-btn>
         </template>
         <v-list>
-          <v-list-item>
+          <v-list-item a href="https://eipl.org/bulletinboard/user">
             <v-list-item-avatar>
               <v-icon color="primary" dark>mdi-account-circle</v-icon>
             </v-list-item-avatar>
@@ -42,9 +42,23 @@
     name: 'Header',
     data: () => ({
       menuShow: false,
+      userMenu: false,
       title: 'VULLETINBOARD',
       titlebarimg: '/images/banner33.jpg',
     }),
+    computed: {
+      isAdmin() {
+        //placeholder for when auth is implemented
+        return this.$store.getters.isAdmin
+      },
+      isAuth() {
+        //placeholder for when auth is implemented
+        return this.$store.getters.isAuth
+      },
+      showMenu() {
+        return this.userMenu || (this.isAuth && this.menuShow)
+      },
+    },
   }
 </script>
 

@@ -41,32 +41,22 @@
       }),
     },
     methods: {
-      async getFeed() {
+      async feedFetch(rss) {
+        const corsproxy = `${APP_URL}corsproxy/proxy.php?csurl=`
+        // debug
         // this.newsfeed = `Herman Cain, former GOP presidential candidate, dies from coronavirus at 74 •  Judge blocks Trump admin's rule barring immigrants who use public benefits •  Army ready to begin broad review at Fort Hood in wake of Guillen murder •  'We will not be leaving' Portland until 'safety' is restored: Trump •  Few medical reasons for not wearing a face mask •  Police: Florida couple jailed for refusing to quarantine •  Another cache of documents related to Ghislaine Maxwell expected to be released •  Trump nominee hearing pulled after furor over Islam remarks •  UK scientists to immunize hundreds with coronavirus vaccine •  Wisconsin governor orders masks statewide amid virus surge •  Russia sentences 2nd ex-US Marine to long jail sentence •  UK rapper Solo 45 sentenced to 24 years for violent rapes •  Trump stokes racist fears after revoking Obama-era housing rule • LIVE:  ABC News Live •  Prosecutor not charging Ferguson officer who killed Michael Brown •  Herman Cain, former GOP presidential candidate, dies from coronavirus at 74 •  Judge blocks Trump admin's rule barring immigrants who use public benefits •  Army ready to begin broad review at Fort Hood in wake of Guillen murder •  'We will not be leaving' Portland until 'safety' is restored: Trump •  Few medical reasons for not wearing a face mask •  Police: Florida couple jailed for refusing to quarantine •  Another cache of documents related to Ghislaine Maxwell expected to be released •  Trump nominee hearing pulled after furor over Islam remarks •  UK scientists to immunize hundreds with coronavirus vaccine •  Wisconsin governor orders masks statewide amid virus surge`
         // return
-        const corsproxy = `${APP_URL}corsproxy/proxy.php?csurl=`
-        const rssfeed = 'http://abcnews.go.com/abcnews/topstories'
+        // const rss = 'https://abcnews.go.com/abcnews/topstories'
         const parser = new RSSParser()
-        let feed = ''
+        let feed = null
         try {
-          feed = await parser.parseURL(corsproxy + rssfeed)
+          return await parser.parseURL(corsproxy + rss)
         } catch (err) {
           console.log('get feed error', err)
         }
-        this.newsfeed = await this.parseFeed(feed.items || [])
       },
-      marqueeSpeed() {
-        const speeds = {
-          1: 'one',
-          2: 'two',
-          3: 'three',
-          4: 'four',
-          5: 'five',
-        }
-        return speeds[this.settings.tickerSpeed] || 'three'
-      },
-      async parseFeed(items = []) {
-        const filters = ['WATCH:']
+      feedParse(items = []) {
+        const filters = ['LIVE:', 'WATCH:'] //todo: add this to defaults for abc feed
         let feedStr = ''
         const defaultText = 'Welcome to Vulletinboard!'
         if (!items || items.length < 1) {
@@ -83,6 +73,7 @@
           })
         }
         //fill ticker space
+        //todo: calc width, determine padding by vw
         if (feedStr.length < 800) {
           let count = 1
           while (count < 5) {
@@ -91,6 +82,16 @@
           }
         }
         return feedStr
+      },
+      marqueeSpeed() {
+        const speeds = {
+          1: 'one',
+          2: 'two',
+          3: 'three',
+          4: 'four',
+          5: 'five',
+        }
+        return speeds[this.settings.tickerSpeed] || 'three'
       },
       timeUpdate() {
         const now = new Date()
@@ -108,8 +109,15 @@
         this.time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} ${period}`
       },
     },
-    created() {
-      this.getFeed()
+    async created() {
+      let items = []
+      if (this?.settings?.tickerRss === 'custom') {
+        items = this.settings.tickerFeed
+      } else {
+        items = await this.feedFetch(this.settings.tickerRss)
+        items = items.items
+      }
+      this.newsfeed = this.feedParse(items)
       this.timeInterval = setInterval(this.timeUpdate, 1000)
     },
     beforeDestroy() {

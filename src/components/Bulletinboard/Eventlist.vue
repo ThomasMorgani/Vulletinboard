@@ -1,10 +1,10 @@
 <template>
   <v-sheet id="itemList" ref="itemList" color="transparent" class="itemColumn d-flex flex-column justify-start  ma-1">
-    <v-card flat tile color="primary" ref="eventListTitleCard" @click="$emit('showNext')" class="white--text ">
+    <v-card flat tile color="primary" ref="eventListTitleCard" class="white--text ">
       <v-card-title class="d-flex justify-space-between headline">
-        <v-icon color="white">mdi mdi-calendar-blank-outline</v-icon>
-        EVENTS
-        <v-icon color="white">mdi mdi-calendar-blank-outline</v-icon>
+        <v-icon color="white" @click="$emit('showPrevious')">mdi-calendar-arrow-left</v-icon>
+        <h4 class="text-h5">EVENTS</h4>
+        <v-icon color="white" @click="$emit('showNext')">mdi-calendar-arrow-right</v-icon>
       </v-card-title>
     </v-card>
     <div group class="itemList">

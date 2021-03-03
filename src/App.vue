@@ -4,10 +4,11 @@
     <v-main>
       <router-view />
     </v-main>
-    <Ticker v-if="$route.name === 'Bulletinboard'"></Ticker>
+    <Ticker v-if="tickerShow"></Ticker>
   </v-app>
 </template>
 <script>
+  import { mapState } from 'vuex'
   import Header from '@/components/Layout/Header'
   import Ticker from '@/components/Bulletinboard/Ticker'
   export default {
@@ -15,6 +16,14 @@
     components: {
       Header,
       Ticker,
+    },
+    computed: {
+      ...mapState({
+        ticker: state => state.ticker,
+      }),
+      tickerShow() {
+        return this.$route.name === 'Bulletinboard' && this?.ticker?.tickerShow
+      },
     },
   }
 </script>

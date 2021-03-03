@@ -1,7 +1,7 @@
 <template>
   <v-sheet :color="settings.backgroundColor" height="100%" width="100%" class="d-flex flex-no-wrap align-start justify-start">
     <!--EVENT LIST -->
-    <EventList v-if="!isLoading" @showNext="itemCycle" @selectItem="itemSelect"></EventList>
+    <EventList v-if="!isLoading" @showNext="itemNext" @showPrevious="itemPrevious" @selectItem="itemSelect"></EventList>
     <!--IMAGE -->
     <EventImage :key="displayedEventImage" :image="displayedEventImage" class="d-flex flex-grow-1 flex-shrink-0"></EventImage>
   </v-sheet>
@@ -43,7 +43,7 @@
       async init() {
         console.log('apiCall')
         await this.$store.dispatch('initBulletinboard')
-        this.resetInterval(this.itemCycle, this.settings.itemTimeout)
+        this.resetInterval(this.itemNext, this.settings.itemTimeout)
         this.isLoading = false
       },
       itemSelect(item) {
@@ -53,7 +53,7 @@
         }
         const items = [item, ...this.items.filter(i => i.id != item.id)]
         this.$store.dispatch('itemsSet', items)
-        this.resetInterval(this.itemCycle, this.settings.itemTimeout)
+        this.resetInterval(this.itemNext, this.settings.itemTimeout)
       },
       resetInterval(cb, time) {
         if (this.intervalId) {
@@ -61,11 +61,21 @@
         }
         this.intervalId = setInterval(cb, time)
       },
-      itemCycle() {
+      itemNext() {
         if (Array.isArray(this.items)) {
           const items = [...this.items]
           items.push(items.shift())
           this.$store.dispatch('itemsSet', items)
+          this.resetInterval(this.itemNext, this.settings.itemTimeout)
+        }
+        return
+      },
+      itemPrevious() {
+        if (Array.isArray(this.items)) {
+          const items = [...this.items]
+          items.unshift(items.pop())
+          this.$store.dispatch('itemsSet', items)
+          this.resetInterval(this.itemNext, this.settings.itemTimeout)
         }
         return
       },

@@ -10,25 +10,33 @@
       <v-btn text class="secondary--text" exact :to="{ name: 'Bulletinboard' }"> <v-icon left>mdi-pin</v-icon>Bulletinboard </v-btn>
       <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Content </v-btn>
       <v-btn v-if="isAdmin" text class="secondary--text" :to="{ name: 'Settings' }"><v-icon left>mdi-cog</v-icon>ADMIN</v-btn>
-      <v-menu bottom open-on-hover offset-y v-model="userMenu">
+      <v-menu v-model="userMenu" bottom :close-on-content-click="false" offset-y open-on-hover>
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="secondary" text v-bind="attrs" v-on="on"> <v-icon left>mdi-account-circle</v-icon>Profile </v-btn>
         </template>
-        <v-list>
+        <v-list dense>
+          <v-list-item>
+            <v-list-item-avatar>
+              <v-icon color="primary">mdi-theme-light-dark</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content class="text-center  primary--text">
+              <v-switch hide-details :input-value="!$vuetify.theme.isDark" @change="toggleTheme" class="mt-0 px-4"></v-switch>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item a href="https://eipl.org/bulletinboard/user">
             <v-list-item-avatar>
-              <v-icon color="primary" dark>mdi-account-circle</v-icon>
+              <v-icon color="primary">mdi-account-circle</v-icon>
             </v-list-item-avatar>
-            <v-list-item-content class="blue--text">
-              <v-list-item-title class="primary--text">PROFILE</v-list-item-title>
+            <v-list-item-content class="text-left primary--text">
+              <v-list-item-title class="font-weight-bold">PROFILE</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item a href="https://eipl.org/bulletinboard/login/logout">
             <v-list-item-avatar>
-              <v-icon color="primary" dark>mdi-logout-variant</v-icon>
+              <v-icon color="primary">mdi-logout-variant</v-icon>
             </v-list-item-avatar>
-            <v-list-item-content class="primary--text">
-              <v-list-item-title>LOGOUT</v-list-item-title>
+            <v-list-item-content class="text-left primary--text">
+              <v-list-item-title class=" font-weight-bold">LOGOUT</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -58,6 +66,16 @@
       showMenu() {
         return this.userMenu || (this.isAuth && this.menuShow)
       },
+    },
+    methods: {
+      toggleTheme() {
+        this.$vuetify.theme.isDark = !this.$vuetify.theme.isDark
+        localStorage.setItem('isDark', this.$vuetify.theme.isDark)
+      },
+    },
+    created() {
+      const isDark = localStorage.getItem('isDark') || false
+      this.$vuetify.theme.isDark = isDark === 'true'
     },
   }
 </script>

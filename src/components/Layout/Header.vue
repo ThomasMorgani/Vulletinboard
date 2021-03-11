@@ -20,7 +20,7 @@
               <v-icon color="primary">mdi-theme-light-dark</v-icon>
             </v-list-item-avatar>
             <v-list-item-content class="text-center  primary--text">
-              <v-switch hide-details :input-value="!$vuetify.theme.isDark" @change="toggleTheme" class="mt-0 px-4"></v-switch>
+              <ThemeToggle></ThemeToggle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item a href="https://eipl.org/bulletinboard/user">
@@ -46,8 +46,10 @@
 </template>
 
 <script>
+  import ThemeToggle from '@/components/Controls/SwitchTheme'
   export default {
     name: 'Header',
+    components: { ThemeToggle },
     data: () => ({
       menuShow: false,
       userMenu: false,
@@ -66,16 +68,6 @@
       showMenu() {
         return this.userMenu || (this.isAuth && this.menuShow)
       },
-    },
-    methods: {
-      toggleTheme() {
-        this.$vuetify.theme.isDark = !this.$vuetify.theme.isDark
-        localStorage.setItem('isDark', this.$vuetify.theme.isDark)
-      },
-    },
-    created() {
-      const isDark = localStorage.getItem('isDark') || false
-      this.$vuetify.theme.isDark = isDark === 'true'
     },
   }
 </script>

@@ -11,6 +11,11 @@ const routes = [
     component: Bulletinboard,
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "login" */ '@/components/Login/Login.vue'),
+  },
+  {
     path: '/manage',
     name: 'Manage',
     component: () => import(/* webpackChunkName: "mgmt" */ '@/components/Management/Management.vue'),

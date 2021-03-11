@@ -10,10 +10,10 @@
       <v-select color v-model="mode" :items="modeOptions" :messages="mode === 'color' ? 'Set a static color' : 'The active image\'s dominant color will be used.'"></v-select>
 
       <v-sheet class="d-flex align-center justify-space-around" v-if="mode === 'color'">
-        <v-color-picker disabled class="ma-2" hide-inputs v-model="color"></v-color-picker>
+        <v-color-picker class="ma-2" hide-inputs v-model="color"></v-color-picker>
       </v-sheet>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions class="pa-4">
       <v-btn tile color="success" :disabled="setting.value === color" width="150">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="setting.value === color" @click="color = setting.value">REVERT </v-btn>
     </v-card-actions>

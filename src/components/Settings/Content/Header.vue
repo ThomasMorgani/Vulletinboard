@@ -44,7 +44,7 @@
         </v-card-text>
       </v-card>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions class="pa-4">
       <v-btn tile color="success" :disabled="actionDisabled" width="150">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
     </v-card-actions>

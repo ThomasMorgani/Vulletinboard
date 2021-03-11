@@ -1,8 +1,9 @@
 <template>
   <v-app id="app">
     <Header></Header>
-    <v-main>
-      <router-view />
+    <v-main :style="mainStyle">
+      <v-progress-circular v-if="appLoading" color="primary" indeterminate></v-progress-circular>
+      <router-view v-else />
     </v-main>
     <Ticker v-if="tickerShow"></Ticker>
   </v-app>
@@ -19,11 +20,20 @@
     },
     computed: {
       ...mapState({
+        appLoading: state => state.appLoading,
         ticker: state => state.ticker,
       }),
+      mainStyle() {
+        return {
+          background: 'black',
+        }
+      },
       tickerShow() {
         return this.$route.name === 'Bulletinboard' && this?.ticker?.tickerShow
       },
+    },
+    created() {
+      this.$store.dispatch('init', this.$vuetify)
     },
   }
 </script>

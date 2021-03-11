@@ -11,7 +11,7 @@
         <v-text-field
           v-model="timeout"
           color="primary"
-          :error-messages="!timeoutVal || timeoutVal < 1 ? 'must be greater than 0' : null"
+          :error-messages="!itemTimeout || itemTimeout < 1 ? 'must be greater than 0' : null"
           min="1"
           type="number"
           class="mx-2"
@@ -19,18 +19,46 @@
         <v-select color="primary" v-model="metric" :items="metricOptions" class="mx-2"></v-select>
       </v-sheet>
     </v-card-text>
-    <v-card-actions>
-      <v-btn tile color="success" :disabled="setting.value === timeoutVal || timeoutVal < 1" width="150">SAVE </v-btn>
-      <v-btn tile color="warning" :disabled="setting.value === timeoutVal" @click="revertSetting">REVERT </v-btn>
+    <v-card-actions class="pa-4">
+      <v-btn tile color="success" :disabled="setting.value === itemTimeout || itemTimeout < 1" width="150">SAVE </v-btn>
+      <v-btn tile color="warning" :disabled="setting.value === itemTimeout" @click="revertSetting">REVERT </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
   export default {
-    name: 'SettingItemTimeout',
+    name: 'itemList',
     props: {
-      setting: {
+      headerColor: {
+        type: String,
+        required: true,
+      },
+      headerText: {
+        type: String,
+        required: true,
+      },
+      itemColor: {
+        type: String,
+        required: true,
+      },
+      itemTextDescription: {
+        type: String,
+        required: true,
+      },
+      itemTextFooter: {
+        type: String,
+        required: true,
+      },
+      itemTextSubtitle: {
+        type: String,
+        required: true,
+      },
+      itemTextTitle: {
+        type: String,
+        required: true,
+      },
+      itemTimeout: {
         type: Object,
         required: true,
       },
@@ -38,15 +66,14 @@
     data: () => ({
       metric: 'seconds',
       metricOptions: ['seconds', 'minutes', 'hours'],
-      timeoutVal: null,
     }),
     computed: {
       timeout: {
         get() {
-          return this.fromMilliseconds(this.timeoutVal)
+          return this.fromMilliseconds(this.itemTimeout.value)
         },
         set(e) {
-          this.timeoutVal = this.toMilliseconds(e)
+          this.$emit('input', { setting: 'itemTimeout', value: toMilliseconds($event.target.value) })
         },
       },
     },
@@ -65,11 +92,11 @@
         }
       },
       revertSetting() {
-        this.timeoutVal = this.setting.value
+        this.itemTimeout = this.setting.value
         this.setUnit()
       },
       setUnit() {
-        const timeout = this.timeoutVal
+        const timeout = this.itemTimeout
         switch (true) {
           case timeout < 60000:
             this.metric = 'seconds'
@@ -99,8 +126,8 @@
       },
     },
     mounted() {
-      this.timeoutVal = this.setting.value
-      this.setUnit()
+      // this.itemTimeout = this.setting.value
+      // this.setUnit()
     },
   }
 </script>

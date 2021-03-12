@@ -63,8 +63,10 @@ export default new Vuex.Store({
       commit('COMMIT_ITEMS', items)
     },
     themeSet({ commit }, { $vuetify, theme }) {
+      console.log(theme)
       commit('COMMIT_THEME', theme)
-      $vuetify.theme.isDark = theme.isDark
+      $vuetify.theme.dark = theme.isDark
+      localStorage.setItem('dark', theme.isDark)
       $vuetify.theme.themes.dark = { ...$vuetify.theme.themes.dark, ...theme.dark }
       $vuetify.theme.themes.light = { ...$vuetify.theme.themes.light, ...theme.light }
     },

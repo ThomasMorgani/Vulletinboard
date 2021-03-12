@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat color="transparent">
     <v-card-title class="subheading primary--text pt-1 pb-2 pl-0 ">
       FILTERS
       <v-btn small text color="error" :disabled="filtersCount < 1" @click="$emit('filtersClear')" class="ml-2">

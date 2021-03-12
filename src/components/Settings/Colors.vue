@@ -48,8 +48,8 @@
           </v-card>
         </v-card-text>
         <v-card-actions class="pa-4">
-          <v-btn tile color="success" width="150">SAVE {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
-          <v-btn tile color="warning" @click="resetColors">REVERT {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
+          <v-btn color="success" :disabled="actionsDisabled" tile width="150">SAVE {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
+          <v-btn color="warning" :disabled="actionsDisabled" tile @click="resetColors">REVERT {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-card-text>
@@ -70,12 +70,11 @@
       isDark() {
         return this.$vuetify.theme.isDark
       },
-      revertDisabled() {
-        const currentTheme = JSON.parse(this.currentTheme)
+      actionsDisabled() {
         const mode = this.isDark ? 'dark' : 'light'
-        console.log(JSON.stringify(currentTheme[mode]))
-        console.log(JSON.stringify(this.$vuetify.theme.themes[mode]))
-        return JSON.stringify(currentTheme[mode]) === JSON.stringify(this.$vuetify.theme.themes[mode])
+        // console.log(JSON.stringify(this.currentTheme[mode]))
+        // console.log(JSON.stringify(this.$vuetify.theme.themes[mode]))
+        return JSON.stringify(this?.currentTheme?.[mode]) === JSON.stringify(this?.$vuetify?.theme?.themes?.[mode])
       },
       theme() {
         const { dark, light } = this.$vuetify.theme.themes
@@ -91,6 +90,7 @@
         this.isDark ? (this.$vuetify.theme.themes.dark = { ...currentTheme.dark }) : (this.$vuetify.theme.themes.light = { ...currentTheme.light })
       },
       setColor(data, color) {
+        console.log(data, color)
         const { dark, light } = this.$vuetify.theme.themes
         const isDark = this.$vuetify.theme.isDark
         const val = data || ''
@@ -98,7 +98,9 @@
       },
     },
     mounted() {
-      this.currentTheme = JSON.stringify(this.$vuetify.theme.themes)
+      const { light, dark } = this.$vuetify.theme.themes
+      this.currentTheme = { light: { ...light }, dark: { ...dark } }
+      console.log(this.currentTheme)
     },
   }
 </script>

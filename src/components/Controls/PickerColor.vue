@@ -6,7 +6,22 @@
 
     <v-card
       ><v-card-text>
-        <v-color-picker :key="btnProps.color" mode="hexa" show-swatches @input="$emit('input', $event)" :value="btnProps.value" class="ma-2"></v-color-picker>
+        <v-select v-model="selection" color="primary" :items="predefined" label="Predefined colors">
+          <template #selection="{item}">
+            <span class="text-capitalize">
+              {{ item }}
+            </span>
+          </template>
+          <template #item="{item, attrs, on}">
+            <v-list-item v-bind="attrs" v-on="on">
+              <v-list-item-avatar>
+                <v-avatar :color="theme.light[item]"> </v-avatar>
+              </v-list-item-avatar>
+              <v-list-item-content class="text-h6 text-capitalize">{{ item }}</v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-select>
+        <v-color-picker v-model="pickerColor" mode="hexa" show-swatches class="ma-2"></v-color-picker>
       </v-card-text>
     </v-card>
   </v-menu>
@@ -23,19 +38,63 @@
     },
     data: () => ({
       modal: false,
+      picker: '',
+      predefined: ['primary', 'secondary', 'accent', 'background', 'custom'],
+      select: null,
     }),
     computed: {
+      pickerColor: {
+        get() {
+          return this.picker
+        },
+        set(v) {
+          const themes = this.$vuetify.theme.themes
+          const colorsDark = { ...themes.dark }
+          const colorsLight = { ...themes.light }
+          this.picker = v
+          if ([...Object.values(colorsDark), ...Object.values(colorsLight)].indexOf(v) < 0) {
+            this.select = 'custom'
+            this.$emit('input', v)
+          } else {
+            this.$emit('input', this.select)
+          }
+        },
+      },
+      selection: {
+        get() {
+          return this.select
+        },
+        set(v) {
+          this.select = v
+          if (this.select !== 'custom') {
+            const themes = this.$vuetify.theme.themes
+            this.picker = this.$vuetify.theme.isDark ? themes.dark[v] : themes.light[v]
+            this.$emit('input', v)
+          }
+        },
+      },
       customProps() {
         const defaults = {
           color: 'primary',
-          label: '',
-          width: 40,
+          label: this.btnProps.value || '',
+          width: 200,
         }
         return { ...defaults, ...this.btnProps }
       },
       theme() {
         return this.$vuetify.theme.themes
       },
+    },
+    mounted() {
+      console.log('created')
+      console.log(this.btnProps.color)
+      if (this.predefined.indexOf(this.btnProps.color) > -1) {
+        this.selection = this.btnProps.color
+        this.picker = this.$vuetify.theme.themes.light[this.btnProps.color]
+      } else {
+        this.picker = this.btnProps.color
+        this.select = 'custom'
+      }
     },
   }
 </script>

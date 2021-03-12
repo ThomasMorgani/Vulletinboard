@@ -1,61 +1,86 @@
 <template>
   <v-card outlined class="">
     <v-card-title class="text-h5 primary--text">
-      {{ setting.label }}
+      Item
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">
-      <p class="">
-        {{ setting.description }}
-      </p>
-      <v-sheet class="d-flex align-center justify-space-around">
-        <v-text-field
-          v-model="timeout"
-          color="primary"
-          :error-messages="!itemTimeout || itemTimeout < 1 ? 'must be greater than 0' : null"
-          min="1"
-          type="number"
-          class="mx-2"
-        ></v-text-field>
-        <v-select color="primary" v-model="metric" :items="metricOptions" class="mx-2"></v-select>
-      </v-sheet>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemColor.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemColor.description }}</p>
+          <Colorpicker @input="setItem('itemColor', $event)" :btnProps="{ color: itemColor.value, value: itemColor.value }"></Colorpicker>
+        </v-card-text>
+      </v-card>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemTextTitle.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemTextTitle.description }}</p>
+          <Colorpicker @input="setItem('itemTextTitle', $event)" :btnProps="{ color: itemTextTitle.value, value: itemTextTitle.value }"></Colorpicker>
+        </v-card-text>
+      </v-card>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemTextSubtitle.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemTextSubtitle.description }}</p>
+          <Colorpicker @input="setItem('itemTextSubtitle', $event)" :btnProps="{ color: itemTextSubtitle.value, value: itemTextSubtitle.value }"></Colorpicker>
+        </v-card-text>
+      </v-card>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemTextDescription.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemTextDescription.description }}</p>
+          <Colorpicker @input="setItem('itemTextDescription', $event)" :btnProps="{ color: itemTextDescription.value, value: itemTextDescription.value }"></Colorpicker>
+        </v-card-text>
+      </v-card>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemTextFooter.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemTextFooter.description }}</p>
+          <Colorpicker @input="setItem('itemTextFooter', $event)" :btnProps="{ color: itemTextFooter.value, value: itemTextFooter.value }"></Colorpicker>
+        </v-card-text>
+      </v-card>
     </v-card-text>
     <v-card-actions class="pa-4">
-      <v-btn tile color="success" :disabled="setting.value === itemTimeout || itemTimeout < 1" width="150">SAVE </v-btn>
-      <v-btn tile color="warning" :disabled="setting.value === itemTimeout" @click="revertSetting">REVERT </v-btn>
+      <v-btn tile color="success" :disabled="actionDisabled" width="150">SAVE </v-btn>
+      <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
+  import Colorpicker from '@/components/Controls/PickerColor'
   export default {
-    name: 'itemList',
+    name: 'SettingsItem',
+    components: { Colorpicker },
     props: {
-      headerColor: {
-        type: String,
-        required: true,
-      },
-      headerText: {
-        type: String,
-        required: true,
-      },
       itemColor: {
-        type: String,
+        type: Object,
         required: true,
       },
       itemTextDescription: {
-        type: String,
+        type: Object,
         required: true,
       },
       itemTextFooter: {
-        type: String,
+        type: Object,
         required: true,
       },
       itemTextSubtitle: {
-        type: String,
+        type: Object,
         required: true,
       },
       itemTextTitle: {
-        type: String,
+        type: Object,
         required: true,
       },
       itemTimeout: {
@@ -68,6 +93,9 @@
       metricOptions: ['seconds', 'minutes', 'hours'],
     }),
     computed: {
+      actionDisabled() {
+        return false
+      },
       timeout: {
         get() {
           return this.fromMilliseconds(this.itemTimeout.value)
@@ -91,9 +119,11 @@
             break
         }
       },
-      revertSetting() {
-        this.itemTimeout = this.setting.value
-        this.setUnit()
+      revertSettings() {
+        console.log('irevertSettings')
+      },
+      setItem(item, val) {
+        this.$emit('setItem', { item, val })
       },
       setUnit() {
         const timeout = this.itemTimeout

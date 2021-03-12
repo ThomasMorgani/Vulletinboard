@@ -25,7 +25,7 @@
       }),
       mainStyle() {
         return {
-          background: 'black',
+          // background: 'black',
         }
       },
       tickerShow() {

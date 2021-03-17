@@ -48,7 +48,7 @@
           </v-card>
         </v-card-text>
         <v-card-actions class="pa-4">
-          <v-btn color="success" :disabled="actionsDisabled" tile width="150">SAVE {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
+          <v-btn color="success" :disabled="actionsDisabled" :loading="loadingSave" tile width="150" @click="saveColors">SAVE {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
           <v-btn color="warning" :disabled="actionsDisabled" tile @click="resetColors">REVERT {{ isDark ? ' DARK' : ' LIGHT' }}</v-btn>
         </v-card-actions>
       </v-card>
@@ -65,6 +65,7 @@
     components: { Colorpicker, ThemeToggle },
     data: () => ({
       currentTheme: null,
+      loadingSave: false,
     }),
     computed: {
       isDark() {
@@ -72,9 +73,7 @@
       },
       actionsDisabled() {
         const mode = this.isDark ? 'dark' : 'light'
-        // console.log(JSON.stringify(this.currentTheme[mode]))
-        // console.log(JSON.stringify(this.$vuetify.theme.themes[mode]))
-        return JSON.stringify(this?.currentTheme?.[mode]) === JSON.stringify(this?.$vuetify?.theme?.themes?.[mode])
+        return JSON.stringify(this?.currentTheme?.[mode]) === JSON.stringify(this?.$vuetify?.theme?.themes?.[mode]) || this.loadingSave
       },
       theme() {
         const { dark, light } = this.$vuetify.theme.themes
@@ -86,21 +85,33 @@
     },
     methods: {
       resetColors() {
-        const currentTheme = JSON.parse(this.currentTheme)
-        this.isDark ? (this.$vuetify.theme.themes.dark = { ...currentTheme.dark }) : (this.$vuetify.theme.themes.light = { ...currentTheme.light })
+        this.isDark ? (this.$vuetify.theme.themes.dark = { ...this.currentTheme.dark }) : (this.$vuetify.theme.themes.light = { ...this.currentTheme.light })
       },
-      setColor(data, color) {
-        console.log(data, color)
+      async saveColors() {
+        this.loadingSave = true
+        const theme = {
+          isDark: this.isDark,
+          theme: this.isDark ? this.$vuetify.theme.themes.dark : this.$vuetify.theme.themes.light,
+        }
+        const resp = await this.$store.dispatch('apiPost', { endpoint: 'manage/settings/theme', postData: theme })
+        if (resp.status === 'success') {
+          const mode = this.isDark ? 'dark' : 'light'
+          this.currentTheme = { ...this.currentTheme, [mode]: { ...theme.theme } }
+        }
+        //dispatch sb
+        this.loadingSave = false
+        console.log(resp)
+      },
+      setColor(data = '', color) {
         const { dark, light } = this.$vuetify.theme.themes
         const isDark = this.$vuetify.theme.isDark
-        const val = data || ''
+        const val = data.substr(0, 1) === '#' ? data : light[data] || ''
         isDark ? (dark[color] = val) : (light[color] = val)
       },
     },
     mounted() {
       const { light, dark } = this.$vuetify.theme.themes
       this.currentTheme = { light: { ...light }, dark: { ...dark } }
-      console.log(this.currentTheme)
     },
   }
 </script>

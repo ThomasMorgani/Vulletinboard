@@ -32,7 +32,7 @@
         return this.$route.name === 'Bulletinboard' && this?.ticker?.tickerShow
       },
     },
-    created() {
+    mounted() {
       this.$store.dispatch('init', this.$vuetify)
     },
   }

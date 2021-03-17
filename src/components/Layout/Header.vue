@@ -47,6 +47,7 @@
 
 <script>
   import ThemeToggle from '@/components/Controls/SwitchTheme'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'Header',
     components: { ThemeToggle },
@@ -57,14 +58,7 @@
       titlebarimg: '/images/banner33.jpg',
     }),
     computed: {
-      isAdmin() {
-        //placeholder for when auth is implemented
-        return this.$store.getters.isAdmin
-      },
-      isAuth() {
-        //placeholder for when auth is implemented
-        return this.$store.getters.isAuth
-      },
+      ...mapGetters(['isAdmin', 'isAuth']),
       showMenu() {
         return this.userMenu || (this.isAuth && this.menuShow)
       },

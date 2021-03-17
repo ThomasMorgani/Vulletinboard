@@ -2,7 +2,6 @@ import axios from 'axios'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router'
-import Vuetify from '../plugins/vuetify'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -13,16 +12,17 @@ export default new Vuex.Store({
     items: [],
     snackbar: {},
     theme: {},
+    user: {
+      roles: ['admin', 'content', 'user'],
+    },
     ticker: {},
   },
   getters: {
-    isAdmin() {
-      //placeholder for when auth is implemented
-      return true
+    isAdmin(state) {
+      return state?.user?.roles?.indexOf('admin') > -1
     },
-    isAuth() {
-      //placeholder for when auth is implemented
-      return true
+    isAuth(state) {
+      return state?.user?.roles?.indexOf('user') > -1
     },
   },
   actions: {
@@ -38,9 +38,20 @@ export default new Vuex.Store({
       }
       return response.data
     },
+    async apiPost({ commit, state }, { endpoint, postData }) {
+      let response = {}
+      try {
+        response = await axios.post(`${API_URL}${endpoint}`, postData)
+      } catch (err) {
+        response = err.response
+      }
+      if (response?.status === 401) {
+        if (router?.currentRoute?.name !== 'Login') router.push({ name: 'Login', params: response })
+      }
+      return response.data
+    },
 
     async init({ commit, dispatch, state }, $vuetify) {
-      console.log($vuetify)
       const data = await dispatch('apiGet', '')
       commit('COMMIT_APPLOADING', false)
       if (data) {
@@ -63,10 +74,12 @@ export default new Vuex.Store({
       commit('COMMIT_ITEMS', items)
     },
     themeSet({ commit }, { $vuetify, theme }) {
-      console.log(theme)
       commit('COMMIT_THEME', theme)
-      $vuetify.theme.dark = theme.isDark
-      localStorage.setItem('dark', theme.isDark)
+      const darkStored = localStorage.getItem('dark')
+      if (darkStored === null) {
+        $vuetify.theme.dark = theme.isDark
+        localStorage.setItem('dark', theme.isDark)
+      }
       $vuetify.theme.themes.dark = { ...$vuetify.theme.themes.dark, ...theme.dark }
       $vuetify.theme.themes.light = { ...$vuetify.theme.themes.light, ...theme.light }
     },

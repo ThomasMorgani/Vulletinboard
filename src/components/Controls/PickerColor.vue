@@ -48,15 +48,14 @@
           return this.picker
         },
         set(v) {
-          const themes = this.$vuetify.theme.themes
-          const colorsDark = { ...themes.dark }
-          const colorsLight = { ...themes.light }
           this.picker = v
-          if ([...Object.values(colorsDark), ...Object.values(colorsLight)].indexOf(v) < 0) {
+          const themeColor = this.findThemeColor(v)
+          if (themeColor) {
+            this.select = themeColor
+            this.$emit('input', this.select)
+          } else {
             this.select = 'custom'
             this.$emit('input', v)
-          } else {
-            this.$emit('input', this.select)
           }
         },
       },
@@ -85,11 +84,20 @@
         return this.$vuetify.theme.themes
       },
     },
-    mounted() {
-      console.log('created')
-      console.log(this.btnProps.color)
+    methods: {
+      findThemeColor(val) {
+        //for now only showing light theme colors in predefined list
+        for (let color in this.theme.light) {
+          if (this.theme.light[color] == val) {
+            return color
+          }
+        }
+        return false
+      },
+    },
+    created() {
       if (this.predefined.indexOf(this.btnProps.color) > -1) {
-        this.selection = this.btnProps.color
+        this.select = this.btnProps.color
         this.picker = this.$vuetify.theme.themes.light[this.btnProps.color]
       } else {
         this.picker = this.btnProps.color

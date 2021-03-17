@@ -4,12 +4,16 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     name: 'SwitchTheme',
     props: {
       prepend: {
         default: () => '',
       },
+    },
+    computed: {
+      ...mapGetters(['isAdmin']),
     },
     methods: {
       toggleTheme() {

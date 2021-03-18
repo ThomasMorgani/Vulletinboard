@@ -8,7 +8,7 @@
       </v-card-title>
     </v-card>
     <div group class="itemList">
-      <div class="eventTop"></div>
+      <div class="eventTop" v-if="items.length > 0"></div>
       <transition-group appear name="fade">
         <EventItem
           v-for="(item, key) in items"

@@ -58,7 +58,6 @@
         }
       },
       feedParse(items = []) {
-        console.log(items)
         const filters = ['LIVE:', 'WATCH:'] //todo: add this to defaults for abc feed
         let feedStr = ''
         const defaultText = 'Welcome to Vulletinboard!'

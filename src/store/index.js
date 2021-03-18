@@ -80,7 +80,7 @@ export default new Vuex.Store({
     async initBulletinboard({ dispatch, commit }) {
       const endpoint = 'bulletinboard'
       const data = await dispatch('apiGet', endpoint)
-      if (data) {
+      if (data && typeof data === 'object') {
         for (let item in data) {
           const mutation = `COMMIT_${item.toUpperCase()}`
           commit(mutation, data[item])

@@ -4,6 +4,15 @@
     <v-main :style="mainStyle">
       <v-progress-circular v-if="appLoading" color="primary" indeterminate></v-progress-circular>
       <router-view v-else />
+      <v-snackbar :value="snackbar.value" v-bind="snackbar.options" @input="snackbar = $event" content-class="font-weight-bold">
+        {{ snackbar.message }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn icon v-bind="attrs" @click="snackbar = false">
+            <v-icon :color="snackbar.options.color"> mdi-close </v-icon>
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-main>
     <Ticker v-if="tickerShow"></Ticker>
   </v-app>
@@ -21,12 +30,21 @@
     computed: {
       ...mapState({
         appLoading: state => state.appLoading,
+        snackbarStore: state => state.snackbar,
         ticker: state => state.ticker,
       }),
       mainStyle() {
         return {
           // background: 'black',
         }
+      },
+      snackbar: {
+        get() {
+          return this.snackbarStore
+        },
+        set(v) {
+          this.$store.dispatch('snackbar', { color: 'primary', message: '', value: v })
+        },
       },
       tickerShow() {
         return this.$route.name === 'Bulletinboard' && this?.ticker?.tickerShow

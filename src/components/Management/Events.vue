@@ -1,5 +1,5 @@
 <template>
-  <v-card flat color="transparent">
+  <v-card flat>
     <v-card-title class="title primary--text">
       <v-row>
         <v-col cols="8">
@@ -75,15 +75,6 @@
       ></ItemModal>
       <MediaModal v-bind="modalMedia" @mediaModalToggle="onMediaModalToggle" @input="modalMedia.show = $event"></MediaModal>
     </v-card-text>
-    <v-snackbar v-model="snackbar.value" v-bind="snackbar.options" content-class="font-weight-bold">
-      {{ snackbar.message }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn icon v-bind="attrs" @click="snackbar.value = false">
-          <v-icon :color="snackbar.options.color"> mdi-close </v-icon>
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-card>
 </template>
 
@@ -158,19 +149,6 @@
         show: false,
       },
       search: null,
-      snackbar: {
-        options: {
-          app: true,
-          centered: true,
-          color: '',
-          outlined: true,
-          text: true,
-          timeout: 2500,
-          top: true,
-        },
-        message: '',
-        value: false,
-      },
       tableHeaders: [
         {
           text: 'TITLE',
@@ -372,16 +350,14 @@
       },
       itemDelete(id) {
         this.items = this.items.filter(item => item.id !== id)
-        this.toggleSnackbar('error', 'Item Deleted', true)
+        this.$store.dispatch('snackbar', { color: 'error', message: 'Item Deleted', value: true })
         this.onItemEditClose()
       },
       itemNew() {
         this.modalItem = { item: { ...this.itemDefault }, show: true }
       },
       itemSave(item) {
-        console.log('events: save item ')
-        console.log(item)
-        this.toggleSnackbar('success', 'Item Saved', true)
+        this.$store.dispatch('snackbar', { color: 'success', message: 'Item Saved', value: true })
         this.items = [...this.items.filter(i => i.id !== item.id), { ...item }]
         this.modalItem = { item: { ...this.itemDefault }, show: false }
       },
@@ -443,11 +419,6 @@
               return { icon: '', color: '', tooltip: '' }
           }
         }
-      },
-      toggleSnackbar(color, message, value) {
-        this.snackbar.options.color = color
-        this.snackbar.message = message
-        this.snackbar.value = value
       },
     },
     created() {

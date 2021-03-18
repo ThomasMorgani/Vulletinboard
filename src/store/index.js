@@ -10,7 +10,19 @@ export default new Vuex.Store({
     board: {},
     header: {},
     items: [],
-    snackbar: {},
+    snackbar: {
+      options: {
+        app: true,
+        centered: true,
+        outlined: true,
+        text: true,
+        timeout: 2500,
+        top: true,
+      },
+      color: '',
+      message: '',
+      value: false,
+    },
     theme: {},
     user: {
       roles: ['admin', 'content', 'user'],
@@ -29,9 +41,10 @@ export default new Vuex.Store({
     async apiGet({ commit, state }, endpoint) {
       let response = {}
       try {
-        response = await axios.get(`${API_URL}${endpoint}`)
+        response = await axios.get(`${process.env.VUE_APP_API_URL}${endpoint}`)
       } catch (err) {
         response = err.response
+        console.log(err)
       }
       if (response?.status === 401) {
         if (router?.currentRoute?.name !== 'Login') router.push({ name: 'Login', params: response })
@@ -41,7 +54,7 @@ export default new Vuex.Store({
     async apiPost({ commit, state }, { endpoint, postData }) {
       let response = {}
       try {
-        response = await axios.post(`${API_URL}${endpoint}`, postData)
+        response = await axios.post(`${process.env.VUE_APP_API_URL}${endpoint}`, postData)
       } catch (err) {
         response = err.response
       }
@@ -54,10 +67,14 @@ export default new Vuex.Store({
     async init({ commit, dispatch, state }, $vuetify) {
       const data = await dispatch('apiGet', '')
       commit('COMMIT_APPLOADING', false)
-      if (data) {
-        if (data.theme) {
-          dispatch('themeSet', { $vuetify, theme: data.theme })
+      const darkStored = localStorage.getItem('isDark')
+      if (data?.theme) {
+        if (darkStored === null) {
+          localStorage.setItem('isDark', data.theme.isDark)
+        } else {
+          data.theme.isDark = darkStored === 'true'
         }
+        dispatch('themeSet', { $vuetify, theme: data.theme })
       }
     },
     async initBulletinboard({ dispatch, commit }) {
@@ -73,13 +90,22 @@ export default new Vuex.Store({
     itemsSet({ commit }, items) {
       commit('COMMIT_ITEMS', items)
     },
+    snackbar({ commit, state }, { color, message, value }) {
+      // toggleSnackbar(color, message, value) {
+      const sb = {
+        ...state.snackbar,
+        options: {
+          ...state.snackbar.options,
+          color,
+        },
+        message,
+        value,
+      }
+      commit('COMMIT_SNACKBAR', sb)
+    },
     themeSet({ commit }, { $vuetify, theme }) {
       commit('COMMIT_THEME', theme)
-      const darkStored = localStorage.getItem('dark')
-      if (darkStored === null) {
-        $vuetify.theme.dark = theme.isDark
-        localStorage.setItem('dark', theme.isDark)
-      }
+      $vuetify.theme.dark = theme.isDark
       $vuetify.theme.themes.dark = { ...$vuetify.theme.themes.dark, ...theme.dark }
       $vuetify.theme.themes.light = { ...$vuetify.theme.themes.light, ...theme.light }
     },

@@ -79,7 +79,7 @@
       },
     },
     async created() {
-      const req = await this.$http.get(`${API_URL}manage/settings`)
+      const req = await this.$http.get(`${process.env.VUE_APP_API_URL}manage/settings`)
       if (req?.data) {
         this.settings = { ...req.data }
         this.settingsSaved = { ...req.data }

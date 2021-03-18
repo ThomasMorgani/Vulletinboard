@@ -21,7 +21,7 @@
       },
       src() {
         const isUrl = this.item?.content_media?.includes('/')
-        return this.item.content_media_type === 'image_url' ? this.item.content_media : `${this.$api.mediaUrl}${this.item.content_media}`
+        return this.item.content_media_type === 'image_url' ? this.item.content_media : `${process.env.VUE_APP_MEDIA_URL}${this.item.content_media}`
       },
     },
     methods: {},

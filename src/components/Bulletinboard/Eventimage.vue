@@ -22,7 +22,7 @@
     }),
     computed: {
       imgSrc() {
-        return this.isError ? `${MEDIA_URL}${this.fallback}` : `${MEDIA_URL}${this.image}`
+        return this.isError ? `${process.env.VUE_APP_MEDIA_URL}${this.fallback}` : `${process.env.VUE_APP_MEDIA_URL}${this.image}`
       },
     },
   }

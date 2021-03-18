@@ -18,11 +18,11 @@
     methods: {
       toggleTheme() {
         this.$vuetify.theme.dark = !this.$vuetify.theme.dark
-        localStorage.setItem('dark', this.$vuetify.theme.dark)
+        localStorage.setItem('isDark', this.$vuetify.theme.dark)
       },
     },
-    created() {
-      const isDark = localStorage.getItem('dark') || false
+    mounted() {
+      const isDark = localStorage.getItem('isDark') || false
       this.$vuetify.theme.dark = isDark === 'true'
     },
   }

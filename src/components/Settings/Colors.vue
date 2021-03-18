@@ -1,6 +1,6 @@
 <template>
   <v-card tile width="100%">
-    <v-card-title class="text-h4 primary--text">
+    <v-card-title class=" text-h4 primary--text">
       Base Colors
     </v-card-title>
     <v-card-text>
@@ -97,9 +97,11 @@
         if (resp.status === 'success') {
           const mode = this.isDark ? 'dark' : 'light'
           this.currentTheme = { ...this.currentTheme, [mode]: { ...theme.theme } }
+          this.$store.dispatch('themeSet', { $vuetify: this.$vuetify, theme })
         }
         //dispatch sb
         this.loadingSave = false
+        this.$store.dispatch('snackbar', {})
         console.log(resp)
       },
       setColor(data = '', color) {
@@ -116,4 +118,9 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .test {
+    position: sticky;
+    top: 80px;
+  }
+</style>

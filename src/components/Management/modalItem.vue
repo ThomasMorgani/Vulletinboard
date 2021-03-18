@@ -264,7 +264,7 @@
         console.log('delete item')
         this.btnLoading = 'delete'
         this.$http
-          .get(`${this.$api.apiUrl}manage/bulletinboard/delete/${this.item.id}`)
+          .get(`${process.env.VUE_APP_API_URL}manage/bulletinboard/delete/${this.item.id}`)
           .then(resp => {
             if (resp?.data) {
               const { data, message, status } = resp.data
@@ -285,7 +285,7 @@
         postData.append('mediaFile', this.mediaFile)
         // const postData = { ...this.itemEdit, mediaFile: this.mediaFile }
         this.$http
-          .post(`${this.$api.apiUrl}manage/bulletinboard/update/`, postData, {
+          .post(`${process.env.VUE_APP_API_URL}manage/bulletinboard/update/`, postData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },

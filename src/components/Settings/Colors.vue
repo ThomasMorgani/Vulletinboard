@@ -19,7 +19,7 @@
               Primary
             </v-card-title>
             <v-card-text class="px-0">
-              <Colorpicker @input="setColor($event, 'primary')" :btnProps="{ color: 'primary', label: '     ', value: theme.primary, width: 200 }"></Colorpicker>
+              <Colorpicker @input="setColor($event, 'primary')" :btnProps="{ color: 'primary', label: '     ', value: theme.primary }"></Colorpicker>
             </v-card-text>
           </v-card>
           <v-card tile flat>
@@ -27,7 +27,7 @@
               Secondary
             </v-card-title>
             <v-card-text class="px-0">
-              <Colorpicker @input="setColor($event, 'secondary')" :btnProps="{ color: 'secondary', label: '     ', value: theme.secondary, width: 200 }"></Colorpicker>
+              <Colorpicker @input="setColor($event, 'secondary')" :btnProps="{ color: 'secondary', label: '     ', value: theme.secondary }"></Colorpicker>
             </v-card-text>
           </v-card>
           <v-card tile flat>
@@ -35,7 +35,7 @@
               Accent
             </v-card-title>
             <v-card-text class="px-0">
-              <Colorpicker @input="setColor($event, 'accent')" :btnProps="{ color: 'accent', label: '     ', value: theme.accent, width: 200 }"></Colorpicker>
+              <Colorpicker @input="setColor($event, 'accent')" :btnProps="{ color: 'accent', label: '     ', value: theme.accent }"></Colorpicker>
             </v-card-text>
           </v-card>
           <v-card tile flat>
@@ -43,7 +43,7 @@
               Background
             </v-card-title>
             <v-card-text class="px-0">
-              <Colorpicker @input="setColor($event, 'background')" :btnProps="{ color: 'background', label: '     ', value: theme.background, width: 200 }"></Colorpicker>
+              <Colorpicker @input="setColor($event, 'background')" :btnProps="{ color: 'background', label: '     ', value: theme.background }"></Colorpicker>
             </v-card-text>
           </v-card>
         </v-card-text>

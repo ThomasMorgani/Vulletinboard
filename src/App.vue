@@ -56,6 +56,16 @@
   }
 </script>
 <style lang="scss">
+  html {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -66,6 +76,7 @@
     margin: 0;
     padding: 0;
   }
+
   .titlebartext {
     z-index: 1;
   }

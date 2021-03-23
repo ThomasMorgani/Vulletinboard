@@ -1,7 +1,8 @@
 <template>
   <v-menu v-model="modal" :close-on-content-click="false" :nudge-width="200" offset-x>
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on">{{ customProps.label }}</v-btn>
+      <!-- <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on">{{ customProps.label }}</v-btn> -->
+      <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on" :class="`${textColor}--text`">{{ btnProps.label }}</v-btn>
     </template>
 
     <v-card
@@ -76,9 +77,23 @@
         const defaults = {
           color: 'primary',
           label: this.btnProps.value || '',
+          ripple: false,
           width: 200,
         }
         return { ...defaults, ...this.btnProps }
+      },
+      textColor() {
+        // attribution
+        // https://convertingcolors.com/blog/article/convert_hex_to_rgb_with_javascript.html
+        const color = this.picker
+        if (color?.substr(0, 1) !== '#') {
+          return 'black'
+        }
+        const R = parseInt(color.substr(1, 2), 16)
+        const G = parseInt(color.substr(3, 2), 16)
+        const B = parseInt(color.substr(5, 2), 16)
+        const hsp = Math.sqrt(R * R * 0.241 + G * G * 0.691 + B * B * 0.068)
+        return hsp > 127.5 ? 'black' : 'white'
       },
       theme() {
         return this.$vuetify.theme.themes
@@ -107,4 +122,8 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .v-btn::before {
+    background-color: transparent;
+  }
+</style>

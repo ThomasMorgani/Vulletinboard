@@ -43,8 +43,8 @@
     },
     methods: {
       async init() {
-        console.log('apiCall')
         await this.$store.dispatch('initBulletinboard')
+        //IF ITEMS ,SETTINGS
         this.resetInterval(this.itemNext, this.settings.itemTimeout)
         this.isLoading = false
       },
@@ -58,6 +58,9 @@
         this.resetInterval(this.itemNext, this.settings.itemTimeout)
       },
       resetInterval(cb, time) {
+        if (!cb || !time) {
+          return
+        }
         if (this.intervalId) {
           clearInterval(this.intervalId)
         }

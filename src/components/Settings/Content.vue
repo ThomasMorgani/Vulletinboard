@@ -6,10 +6,11 @@
     <v-card-text v-if="!isLoading">
       <Background :setting="settings.boardBackground" width="100%" class="my-1"></Background>
       <Header
-        :headerColor="settings.headerColor"
-        :headerShow="settings.headerShow"
-        :headerType="settings.headerType"
-        :headerContent="settings.headerContent"
+        :headerColor="settings.boardHeaderColor"
+        :headerShow="settings.boardHeaderShow"
+        :headerType="settings.boardHeaderType"
+        :headerContent="settings.boardHeaderContent"
+        :headerContentAlign="settings.boardHeaderContentAlign"
         width="100%"
         class="my-1"
       ></Header>

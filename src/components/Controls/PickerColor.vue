@@ -1,10 +1,8 @@
 <template>
   <v-menu v-model="modal" :close-on-content-click="false" :nudge-width="200" offset-x>
     <template v-slot:activator="{ on, attrs }">
-      <!-- <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on">{{ customProps.label }}</v-btn> -->
-      <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on" :class="`${textColor}--text`">{{ btnProps.label }}</v-btn>
+      <v-btn v-bind="{ ...attrs, ...customProps }" v-on="on" :class="`${textColor}--text`">{{ customProps.label }}</v-btn>
     </template>
-
     <v-card
       ><v-card-text>
         <v-select v-model="selection" color="primary" :items="predefined" label="Predefined colors">
@@ -15,7 +13,10 @@
           </template>
           <template #item="{item, attrs, on}">
             <v-list-item v-bind="attrs" v-on="on">
-              <v-list-item-avatar>
+              <v-list-item-avatar v-if="item === 'custom'">
+                <v-avatar class="customGradient"></v-avatar>
+              </v-list-item-avatar>
+              <v-list-item-avatar v-else>
                 <v-avatar :color="theme.light[item]"> </v-avatar>
               </v-list-item-avatar>
               <v-list-item-content class="text-h6 text-capitalize">{{ item }}</v-list-item-content>
@@ -50,10 +51,11 @@
         },
         set(v) {
           this.picker = v
-          const themeColor = this.findThemeColor(v)
+          const themeColor = this.themeLabelFromHex(v)
           if (themeColor) {
             this.select = themeColor
-            this.$emit('input', this.select)
+            // this.$emit('input', this.select)
+            this.$emit('input', v)
           } else {
             this.select = 'custom'
             this.$emit('input', v)
@@ -68,8 +70,11 @@
           this.select = v
           if (this.select !== 'custom') {
             const themes = this.$vuetify.theme.themes
-            this.picker = this.$vuetify.theme.isDark ? themes.dark[v] : themes.light[v]
-            this.$emit('input', v)
+            // temp only light colors for now
+            // this.$emit('input', v)
+            // this.picker = this.$vuetify.theme.isDark ? themes.dark[v] : themes.light[v]
+            this.picker = themes.light[v]
+            this.$emit('input', this.picker)
           }
         },
       },
@@ -85,8 +90,8 @@
       textColor() {
         // attribution
         // https://convertingcolors.com/blog/article/convert_hex_to_rgb_with_javascript.html
-        const color = this.picker
-        if (color?.substr(0, 1) !== '#') {
+        const color = this.picker || ''
+        if (typeof color !== 'string' || color?.substr(0, 1) !== '#') {
           return 'black'
         }
         const R = parseInt(color.substr(1, 2), 16)
@@ -100,23 +105,27 @@
       },
     },
     methods: {
-      findThemeColor(val) {
+      themeLabelFromHex(hex = '') {
+        if (typeof hex === 'string' && hex.substr(0, 1) !== '#') return false
         //for now only showing light theme colors in predefined list
-        for (let color in this.theme.light) {
-          if (this.theme.light[color] == val) {
-            return color
-          }
+        for (let label in this.theme.light) {
+          if (this.theme.light[label] === hex) return label
         }
         return false
       },
+      isThemeLabel(color) {
+        return this.predefined.indexOf(color) > -1
+      },
     },
     created() {
-      if (this.predefined.indexOf(this.btnProps.color) > -1) {
-        this.select = this.btnProps.color
-        this.picker = this.$vuetify.theme.themes.light[this.btnProps.color]
+      const color = this.btnProps.color
+      if (this.isThemeLabel(color)) {
+        this.select = color
+        this.picker = this.$vuetify.theme.themes.light[color]
       } else {
-        this.picker = this.btnProps.color
-        this.select = 'custom'
+        const predefined = this.themeLabelFromHex(color)
+        this.picker = color
+        this.select = predefined || 'custom'
       }
     },
   }
@@ -125,5 +134,22 @@
 <style lang="scss" scoped>
   .v-btn::before {
     background-color: transparent;
+  }
+
+  .customGradient {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 1) 0%,
+      rgba(255, 154, 0, 1) 10%,
+      rgba(208, 222, 33, 1) 20%,
+      rgba(79, 220, 74, 1) 30%,
+      rgba(63, 218, 216, 1) 40%,
+      rgba(47, 201, 226, 1) 50%,
+      rgba(28, 127, 238, 1) 60%,
+      rgba(95, 21, 242, 1) 70%,
+      rgba(186, 12, 248, 1) 80%,
+      rgba(251, 7, 217, 1) 90%,
+      rgba(255, 0, 0, 1) 100%
+    );
   }
 </style>

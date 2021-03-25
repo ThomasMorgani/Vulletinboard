@@ -1,11 +1,11 @@
 <template>
   <v-card outlined class="">
     <v-card-title class="text-h5 primary--text">
-      {{ setting.label }}
+      {{ boardSettings.boardBackground.label }}
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">
       <p class="">
-        {{ setting.description }}
+        {{ boardSettings.boardBackground.description }}
       </p>
       <v-select
         color
@@ -15,13 +15,13 @@
         @input="onSelect"
       ></v-select>
 
-      <v-sheet class="d-flex align-center justify-space-around" v-if="mode === 'color'">
+      <v-sheet class="d-flex align-center justify-space-around mt-4" v-if="mode === 'color'">
         <Colorpicker @input="colorSet" :btnProps="{ color, label: '     ', value: color, class: { 'mt-6': true } }"></Colorpicker>
       </v-sheet>
     </v-card-text>
     <v-card-actions class="pa-4">
-      <v-btn tile color="success" :disabled="setting.value === color" width="150" @click="colorSave">SAVE </v-btn>
-      <v-btn tile color="warning" :disabled="setting.value === color || actionLoading" @click="colorRevert">REVERT </v-btn>
+      <v-btn tile color="success" :disabled="boardSettings.boardBackground.value === color" width="150" @click="colorSave">SAVE </v-btn>
+      <v-btn tile color="warning" :disabled="boardSettings.boardBackground.value === color || actionLoading" @click="colorRevert">REVERT </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -34,23 +34,21 @@
     components: {
       Colorpicker,
     },
-    props: {
-      setting: {
-        type: Object,
-        required: true,
-      },
-    },
     data: () => ({
       actionLoading: false,
       color: null,
       mode: 'color',
       modeOptions: ['color', 'dynamic'],
     }),
-
+    computed: {
+      boardSettings() {
+        return this?.$store?.getters?.settingsByCat?.board || {}
+      },
+    },
     methods: {
       colorRevert() {
-        this.mode = this.setting.value === 'dynamic' ? 'dynamic' : 'color'
-        this.color = this.setting.value
+        this.mode = this.boardSettings.boardBackground.value === 'dynamic' ? 'dynamic' : 'color'
+        this.color = this.boardSettings.boardBackground.value
       },
       async colorSave() {
         this.actionLoading = true
@@ -73,11 +71,11 @@
         this.color = val.hexa ?? val
       },
       onSelect(val) {
-        this.color = val === 'dynamic' ? val : this.setting.value === 'dynamic' ? '#FF0000FF' : this.setting.value
+        this.color = val === 'dynamic' ? val : this.boardSettings.boardBackground.value === 'dynamic' ? '#FF0000FF' : this.boardSettings.boardBackground.value
       },
     },
     created() {
-      this.color = this.setting.value
+      this.color = this.boardSettings.boardBackground.value
     },
   }
 </script>

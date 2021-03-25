@@ -6,47 +6,47 @@
     <v-card-text class="d-flex flex-column align-start">
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ itemColor.label }}
+          {{ itemSettings.itemColor.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ itemColor.description }}</p>
-          <Colorpicker @input="setItem('itemColor', $event)" :btnProps="{ color: itemColor.value, value: itemColor.value }"></Colorpicker>
+          <p>{{ itemSettings.itemColor.description }}</p>
+          <Colorpicker @input="setItem('color', $event)" :btnProps="{ color: color }"></Colorpicker>
         </v-card-text>
       </v-card>
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ itemTextTitle.label }}
+          {{ itemSettings.itemTextTitle.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ itemTextTitle.description }}</p>
-          <Colorpicker @input="setItem('itemTextTitle', $event)" :btnProps="{ color: itemTextTitle.value, value: itemTextTitle.value }"></Colorpicker>
+          <p>{{ itemSettings.itemTextTitle.description }}</p>
+          <Colorpicker @input="setItem('title', $event)" :btnProps="{ color: title }"></Colorpicker>
         </v-card-text>
       </v-card>
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ itemTextSubtitle.label }}
+          {{ itemSettings.itemTextSubtitle.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ itemTextSubtitle.description }}</p>
-          <Colorpicker @input="setItem('itemTextSubtitle', $event)" :btnProps="{ color: itemTextSubtitle.value, value: itemTextSubtitle.value }"></Colorpicker>
+          <p>{{ itemSettings.itemTextSubtitle.description }}</p>
+          <Colorpicker @input="setItem('subtitle', $event)" :btnProps="{ color: subtitle }"></Colorpicker>
         </v-card-text>
       </v-card>
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ itemTextDescription.label }}
+          {{ itemSettings.itemTextDescription.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ itemTextDescription.description }}</p>
-          <Colorpicker @input="setItem('itemTextDescription', $event)" :btnProps="{ color: itemTextDescription.value, value: itemTextDescription.value }"></Colorpicker>
+          <p>{{ itemSettings.itemTextDescription.description }}</p>
+          <Colorpicker @input="setItem('description', $event)" :btnProps="{ color: description }"></Colorpicker>
         </v-card-text>
       </v-card>
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ itemTextFooter.label }}
+          {{ itemSettings.itemTextFooter.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ itemTextFooter.description }}</p>
-          <Colorpicker @input="setItem('itemTextFooter', $event)" :btnProps="{ color: itemTextFooter.value, value: itemTextFooter.value }"></Colorpicker>
+          <p>{{ itemSettings.itemTextFooter.description }}</p>
+          <Colorpicker @input="setItem('footer', $event)" :btnProps="{ color: footer }"></Colorpicker>
         </v-card-text>
       </v-card>
     </v-card-text>
@@ -62,48 +62,32 @@
   export default {
     name: 'SettingsItem',
     components: { Colorpicker },
-    props: {
-      itemColor: {
-        type: Object,
-        required: true,
-      },
-      itemTextDescription: {
-        type: Object,
-        required: true,
-      },
-      itemTextFooter: {
-        type: Object,
-        required: true,
-      },
-      itemTextSubtitle: {
-        type: Object,
-        required: true,
-      },
-      itemTextTitle: {
-        type: Object,
-        required: true,
-      },
-      itemTimeout: {
-        type: Object,
-        required: true,
-      },
-    },
     data: () => ({
+      currentSettings: {},
+      color: null,
+      title: null,
+      subtitle: null,
+      description: null,
+      footer: null,
       metric: 'seconds',
       metricOptions: ['seconds', 'minutes', 'hours'],
+      timout: null,
     }),
     computed: {
       actionDisabled() {
         return false
       },
-      timeout: {
-        get() {
-          return this.fromMilliseconds(this.itemTimeout.value)
-        },
-        set(e) {
-          this.$emit('input', { setting: 'itemTimeout', value: toMilliseconds($event.target.value) })
-        },
+      itemSettings() {
+        return this?.$store?.getters?.settingsByCat?.item || {}
       },
+      // timeout: {
+      //   get() {
+      //     return this.fromMilliseconds(this.itemTimeout.value)
+      //   },
+      //   set(e) {
+      //     this.$emit('input', { setting: 'itemTimeout', value: this.toMilliseconds(e.target.value) })
+      //   },
+      // },
     },
     methods: {
       fromMilliseconds(val) {
@@ -120,21 +104,33 @@
         }
       },
       revertSettings() {
-        console.log('irevertSettings')
+        const currentSettings = {
+          background: this.itemSettings.itemColor.value,
+          description: this.itemSettings.itemTextDescription.value,
+          footer: this.itemSettings.itemTextFooter.value,
+          subtitle: this.itemSettings.itemTextSubtitle.value,
+          timeout: this.itemSettings.itemTimeout.value,
+          title: this.itemSettings.itemTextTitle.value,
+        }
+        for (let setting in currentSettings) {
+          this[setting] = currentSettings[setting]
+        }
+        // this.setUnit()
+        this.currentSettings = { ...currentSettings }
       },
       setItem(item, val) {
-        this.$emit('setItem', { item, val })
+        this[item] = val
       },
       setUnit() {
-        const timeout = this.itemTimeout
+        const timeout = this.timeout
         switch (true) {
           case timeout < 60000:
             this.metric = 'seconds'
             break
-          case time >= 60000 && time < 3600000:
+          case timeout >= 60000 && time < 3600000:
             this.metric = 'minutes'
             break
-          case time >= 3600000:
+          case timeout >= 3600000:
             this.metric = 'hours'
             break
           default:
@@ -155,9 +151,8 @@
         }
       },
     },
-    mounted() {
-      // this.itemTimeout = this.setting.value
-      // this.setUnit()
+    created() {
+      this.revertSettings()
     },
   }
 </script>

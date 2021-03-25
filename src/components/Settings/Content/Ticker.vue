@@ -6,19 +6,19 @@
     <v-card-text class="d-flex flex-column align-start">
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ tickerShow.label }}
+          {{ tickerSettings.tickerShow.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ tickerShow.description }}</p>
+          <p>{{ tickerSettings.tickerShow.description }}</p>
           <v-switch color v-model="show" :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" class="mt-0"> </v-switch>
         </v-card-text>
       </v-card>
       <v-card flat width="100%" class="" :disabled="!show">
         <v-card-title class="text-h5 primary--text">
-          {{ tickerFeed.label }}
+          {{ tickerSettings.tickerFeed.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ tickerFeed.description }}</p>
+          <p>{{ tickerSettings.tickerFeed.description }}</p>
           <v-select color v-model="feed" :items="feedOptions">
             <template #append-outer>
               <v-btn small icon color="primary" :href="feed" target="_blank">
@@ -30,10 +30,10 @@
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ tickerFilter.label }}
+          {{ tickerSettings.tickerFilter.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ tickerFilter.description }}</p>
+          <p>{{ tickerSettings.tickerFilter.description }}</p>
           <v-combobox v-model="filter" chips clearable color="primary" deletable-chips full-width item-color="primary" multiple>
             <template #selection="data">
               <v-chip color="primary" close :key="JSON.stringify(data.item)" v-bind="data.attrs" :input-value="data.selected">
@@ -45,10 +45,10 @@
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
-          {{ tickerSpeed.label }}
+          {{ tickerSettings.tickerSpeed.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ tickerSpeed.description }}</p>
+          <p>{{ tickerSettings.tickerSpeed.description }}</p>
           <v-sheet color="transparent" width="50%" class="mt-4">
             <v-slider v-model="speed" color="primary" :max="5" :min="1" step="1" thumb-color="primary" thumb-label="always" ticks="always">
               <template #append>fast</template>
@@ -70,24 +70,6 @@
 <script>
   export default {
     name: 'SettingTicker',
-    props: {
-      tickerFeed: {
-        type: Object,
-        required: true,
-      },
-      tickerFilter: {
-        type: Object,
-        required: true,
-      },
-      tickerShow: {
-        type: Object,
-        required: true,
-      },
-      tickerSpeed: {
-        type: Object,
-        required: true,
-      },
-    },
     data: () => ({
       feed: null,
       feedOptions: [
@@ -105,13 +87,23 @@
       actionDisabled() {
         return !this.show
       },
+      tickerSettings() {
+        return this?.$store?.getters?.settingsByCat?.ticker || {}
+      },
     },
     methods: {
       revertSettings() {
-        this.feed = this.tickerFeed.value
-        this.filter = this.tickerFilter.value ? JSON.parse(this.tickerFilter.value) : []
-        this.show = this.tickerShow.value
-        this.speed = this.tickerSpeed.value
+        const currentSettings = {
+          feed: this.tickerSettings.tickerFeed.value,
+          filter: this.tickerSettings.tickerFilter.value ? JSON.parse(this.tickerSettings.tickerFilter.value) : [],
+          show: this.tickerSettings.tickerShow.value,
+          speed: this.tickerSettings.tickerSpeed.value,
+        }
+        for (let setting in currentSettings) {
+          this[setting] = currentSettings[setting]
+        }
+        // this.setUnit()
+        this.currentSettings = { ...currentSettings }
       },
       toggleTicker() {
         console.log('toggle ticker')

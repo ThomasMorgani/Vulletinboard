@@ -6,37 +6,37 @@
     <v-card-text class="d-flex flex-column align-start">
       <v-card flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ headerShow.label }}
+          {{ boardSettings.boardHeaderShow.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ headerShow.description }}</p>
+          <p>{{ boardSettings.boardHeaderShow.description }}</p>
           <v-switch v-model="show" color hide-details :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" class="mt-0"> </v-switch>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ headerColor.label }}
+          {{ boardSettings.boardHeaderColor.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ headerColor.description }}</p>
-          <Colorpicker @input="color = $event.hexa" :btnProps="{ color: color, label: '     ', value: color }"></Colorpicker>
+          <p>{{ boardSettings.boardHeaderColor.description }}</p>
+          <Colorpicker @input="setColor" :btnProps="{ color: color, label: '     ', value: color }"></Colorpicker>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="" :disabled="!show">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ headerType.label }}
+          {{ boardSettings.boardHeaderType.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ headerType.description }}</p>
+          <p>{{ boardSettings.boardHeaderType.description }}</p>
           <v-select color v-model="type" :items="typeOptions" :messages="type === 'text' ? 'Solid color with text.' : 'Select an image to use as a banner.'"> </v-select>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ headerContent.label }}
+          {{ boardSettings.boardHeaderContent.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ headerContent.description }}</p>
+          <p>{{ boardSettings.boardHeaderContent.description }}</p>
           <v-text-field
             v-model="content"
             color="primary"
@@ -45,12 +45,12 @@
           ></v-text-field>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="">
+      <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ headerContentAlign.label }}
+          {{ boardSettings.boardHeaderContentAlign.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ headerContentAlign.description }}</p>
+          <p>{{ boardSettings.boardHeaderContentAlign.description }}</p>
           <v-select v-model="align" color="primary" :items="alignOptions"></v-select>
         </v-card-text>
       </v-card>
@@ -68,34 +68,13 @@
   export default {
     name: 'SettingHeader',
     components: { Colorpicker },
-    props: {
-      headerColor: {
-        type: Object,
-        required: true,
-      },
-      headerContent: {
-        type: Object,
-        required: true,
-      },
-      headerContentAlign: {
-        type: Object,
-        required: true,
-      },
-      headerShow: {
-        type: Object,
-        required: true,
-      },
-      headerType: {
-        type: Object,
-        required: true,
-      },
-    },
     data: () => ({
       align: 'start',
       alignOptions: ['start', 'center', 'end'],
       color: null,
       content: '',
       currentSettings: {
+        align: null,
         color: null,
         content: null,
         show: null,
@@ -108,31 +87,58 @@
     }),
     computed: {
       actionDisabled() {
-        return false
-        // return JSON.stringify(this?.currentTheme?.[mode]) === JSON.stringify(this?.$vuetify?.theme?.themes?.[mode]) || this.loadingSave
+        const settings = {
+          align: this.align,
+          color: this.color,
+          content: this.content,
+          show: this.show,
+          type: this.type,
+        }
+        const isChanged = JSON.stringify(settings) === JSON.stringify(this.currentSettings)
+        return isChanged || this.loadingSave
+      },
+      boardSettings() {
+        return this?.$store?.getters?.settingsByCat?.board || {}
       },
     },
     methods: {
       revertSettings() {
-        this.color = this.headerColor.value
-        this.show = this.headerShow.value
-        this.content = this.headerContent.value
-        this.type = this.headerType.value
+        const currentSettings = {
+          align: this.boardSettings.boardHeaderContentAlign.value,
+          color: this.boardSettings.boardHeaderColor.value,
+          content: this.boardSettings.boardHeaderContent.value,
+          show: this.boardSettings.boardHeaderShow.value,
+          type: this.boardSettings.boardHeaderType.value,
+        }
+        for (let setting in currentSettings) {
+          this[setting] = currentSettings[setting]
+        }
+        this.currentSettings = { ...currentSettings }
       },
       async saveHeader() {
-        const resp = await this.$store.dispatch('apiPost', { endpoint: 'manage/settings/header', postData: theme })
-        if (resp.status === 'success') {
+        console.log('saveHeader')
+        const postData = {
+          boardHeaderColor: this.color,
+          boardHeaderContent: this.content,
+          boardHeaderContentAlign: this.align,
+          boardHeaderShow: this.show,
+          boardHeaderType: this.type,
         }
-        //dispatch sb
+        this.loadingSave = true
+        const resp = await this.$store.dispatch('apiPost', { endpoint: 'manage/settings/header', postData })
+        if (resp.status === 'success') {
+          this.$store.dispatch('settingsSet', postData)
+          this.revertSettings()
+        }
         this.loadingSave = false
-        this.$store.dispatch('snackbar', {})
-        console.log(resp)
+        const { status: color, message } = resp
+        this.$store.dispatch('snackbar', { color, message, value: true })
       },
-      toggleHeader() {
-        console.log('toggle header')
+      setColor(e) {
+        this.color = e
       },
     },
-    mounted() {
+    created() {
       this.revertSettings()
     },
   }

@@ -23,6 +23,7 @@ export default new Vuex.Store({
       message: '',
       value: false,
     },
+    settings: {},
     theme: {},
     user: {
       roles: ['admin', 'content', 'user'],
@@ -35,6 +36,39 @@ export default new Vuex.Store({
     },
     isAuth(state) {
       return state?.user?.roles?.indexOf('user') > -1
+    },
+    settingsByCat(state) {
+      const settings = {
+        board: {},
+        header: {},
+        item: {},
+        theme: {},
+        ticker: {},
+      }
+      Object.keys(state.settings).forEach(setting => {
+        const str = setting.substring(0, 4)
+        switch (str) {
+          case 'boar':
+            settings.board[setting] = state.settings[setting]
+            break
+          case 'head':
+            settings.header[setting] = state.settings[setting]
+            break
+          case 'item':
+            settings.item[setting] = state.settings[setting]
+            break
+          case 'them':
+            settings.theme[setting] = state.settings[setting]
+            break
+          case 'tick':
+            settings.ticker[setting] = state.settings[setting]
+            break
+          default:
+            console.log(str, 'is not found')
+            break
+        }
+      })
+      return settings
     },
   },
   actions: {
@@ -63,7 +97,6 @@ export default new Vuex.Store({
       }
       return response.data
     },
-
     async init({ commit, dispatch, state }, $vuetify) {
       const data = await dispatch('apiGet', '')
       commit('COMMIT_APPLOADING', false)
@@ -87,8 +120,19 @@ export default new Vuex.Store({
         }
       }
     },
+    headerSet({ commit }, header) {
+      commit('COMMIT_HEADER', header)
+    },
     itemsSet({ commit }, items) {
       commit('COMMIT_ITEMS', items)
+    },
+    settingsSet({ commit, state }, settingsValues) {
+      let settings = {}
+      for (let setting in settingsValues) {
+        const isObject = typeof settingsValues[setting] === 'object' && settingsValues[setting] !== null
+        settings[setting] = isObject ? { ...settingsValues[setting] } : { ...state.settings[setting], value: settingsValues[setting] }
+      }
+      commit('COMMIT_SETTINGS', { ...state.settings, ...settings })
     },
     snackbar({ commit, state }, { color, message, value }) {
       // toggleSnackbar(color, message, value) {
@@ -122,6 +166,9 @@ export default new Vuex.Store({
     },
     COMMIT_ITEMS(state, items) {
       state.items = [...items]
+    },
+    COMMIT_SETTINGS(state, settings) {
+      state.settings = { ...settings }
     },
     COMMIT_SNACKBAR(state, snackbar) {
       state.snackbar = { ...snackbar }

@@ -19,12 +19,11 @@
 </template>
 <script>
   import { mapState } from 'vuex'
-  import Header from '@/components/Layout/Header'
   import Ticker from '@/components/Bulletinboard/Ticker'
   export default {
     name: 'Vulletinboard',
     components: {
-      Header,
+      Header: () => import('@/components/Layout/Header'),
       Ticker,
     },
     computed: {

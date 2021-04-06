@@ -24,27 +24,52 @@
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ boardSettings.boardHeaderType.label }}
+          {{ boardSettings.boardHeaderHeight.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ boardSettings.boardHeaderType.description }}</p>
-          <v-select color v-model="type" :items="typeOptions" :messages="type === 'text' ? 'Solid color with text.' : 'Select an image to use as a banner.'"> </v-select>
+          <p>{{ boardSettings.boardHeaderHeight.description }}</p>
+          <v-text-field v-model="height" color="primary" type="number" min="0"></v-text-field>
         </v-card-text>
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
-          {{ boardSettings.boardHeaderContent.label }}
+          {{ boardSettings.boardHeaderType.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
-          <p>{{ boardSettings.boardHeaderContent.description }}</p>
-          <v-text-field
-            v-model="content"
-            color="primary"
-            :messages="type === 'text' ? 'Enter display text' : 'Enter image url'"
-            :prepend-inner-icon="type === 'text' ? 'mdi-format-text' : 'mdi-link-variant'"
-          ></v-text-field>
+          <p>{{ boardSettings.boardHeaderType.description }}</p>
+          <v-select color v-model="type" :items="typeOptions" :messages="type === 'text' ? 'Solid color with text.' : 'Select an image to use as a image.'"> </v-select>
         </v-card-text>
       </v-card>
+      <v-card v-if="type === 'image'" :disabled="!show" flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text pb-2">
+          {{ boardSettings.boardHeaderText.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ boardSettings.boardHeaderText.description }}</p>
+          <v-text-field v-model="image" color="primary" messages="Enter image url" prepend-inner-icon="mdi-link-variant"></v-text-field>
+        </v-card-text>
+      </v-card>
+      <template v-if="type === 'text'">
+        <v-card :disabled="!show" flat width="100%" class="">
+          <v-card-title class="text-h5 primary--text pb-2">
+            {{ boardSettings.boardHeaderText.label }}
+          </v-card-title>
+          <v-card-text class="d-flex flex-column align-start">
+            <p>{{ boardSettings.boardHeaderText.description }}</p>
+            <v-text-field v-model="text" color="primary" messages="Enter display text" prepend-inner-icon="mdi-format-text"></v-text-field>
+          </v-card-text>
+        </v-card>
+        <v-card :disabled="!show" flat width="100%" class="">
+          <v-card-title class="text-h5 primary--text pb-2">
+            {{ boardSettings.boardHeaderTextColor.label }}
+          </v-card-title>
+          <v-card-text class="d-flex flex-column align-start">
+            <p>{{ boardSettings.boardHeaderTextColor.description }}</p>
+
+            <Colorpicker @input="setTextColor" :btnProps="{ color: textColor, label: '     ', value: textColor }"></Colorpicker>
+          </v-card-text>
+        </v-card>
+      </template>
       <v-card :disabled="!show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
           {{ boardSettings.boardHeaderContentAlign.label }}
@@ -72,18 +97,22 @@
       align: 'start',
       alignOptions: ['start', 'center', 'end'],
       color: null,
-      content: '',
       currentSettings: {
         align: null,
         color: null,
-        content: null,
+        text: null,
+        image: null,
         show: null,
         type: null,
       },
+      height: null,
+      image: null,
       loadingSave: false,
       show: true,
+      text: null,
+      textColor: null,
       type: 'text',
-      typeOptions: ['banner', 'text'],
+      typeOptions: ['image', 'text'],
     }),
     computed: {
       actionDisabled() {
@@ -91,7 +120,10 @@
           align: this.align,
           color: this.color,
           content: this.content,
+          height: this.height,
+          image: this.image,
           show: this.show,
+          textColor: this.textColor,
           type: this.type,
         }
         const isChanged = JSON.stringify(settings) === JSON.stringify(this.currentSettings)
@@ -106,8 +138,11 @@
         const currentSettings = {
           align: this.boardSettings.boardHeaderContentAlign.value,
           color: this.boardSettings.boardHeaderColor.value,
-          content: this.boardSettings.boardHeaderContent.value,
+          height: this.boardSettings.boardHeaderHeight.value,
+          image: this.boardSettings.boardHeaderImage.value,
           show: this.boardSettings.boardHeaderShow.value,
+          text: this.boardSettings.boardHeaderText.value,
+          textColor: this.boardSettings.boardHeaderTextColor.value,
           type: this.boardSettings.boardHeaderType.value,
         }
         for (let setting in currentSettings) {
@@ -119,9 +154,12 @@
         console.log('saveHeader')
         const postData = {
           boardHeaderColor: this.color,
-          boardHeaderContent: this.content,
           boardHeaderContentAlign: this.align,
+          boardHeaderHeight: this.height,
+          boardHeaderImage: this.image,
           boardHeaderShow: this.show,
+          boardHeaderText: this.text,
+          boardHeaderTextColor: this.textColor,
           boardHeaderType: this.type,
         }
         this.loadingSave = true
@@ -136,6 +174,9 @@
       },
       setColor(e) {
         this.color = e
+      },
+      setTextColor(e) {
+        this.textColor = e
       },
     },
     created() {

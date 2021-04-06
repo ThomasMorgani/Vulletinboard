@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    app: {},
     appLoading: true,
     board: {},
     header: {},
@@ -39,6 +40,7 @@ export default new Vuex.Store({
     },
     settingsByCat(state) {
       const settings = {
+        app: {},
         board: {},
         header: {},
         item: {},
@@ -46,21 +48,24 @@ export default new Vuex.Store({
         ticker: {},
       }
       Object.keys(state.settings).forEach(setting => {
-        const str = setting.substring(0, 4)
+        const str = setting.substring(0, 3)
         switch (str) {
-          case 'boar':
+          case 'app':
+            settings.app[setting] = state.settings[setting]
+            break
+          case 'boa':
             settings.board[setting] = state.settings[setting]
             break
-          case 'head':
+          case 'hea':
             settings.header[setting] = state.settings[setting]
             break
-          case 'item':
+          case 'ite':
             settings.item[setting] = state.settings[setting]
             break
-          case 'them':
+          case 'the':
             settings.theme[setting] = state.settings[setting]
             break
-          case 'tick':
+          case 'tic':
             settings.ticker[setting] = state.settings[setting]
             break
           default:
@@ -99,16 +104,22 @@ export default new Vuex.Store({
     },
     async init({ commit, dispatch, state }, $vuetify) {
       const data = await dispatch('apiGet', '')
-      commit('COMMIT_APPLOADING', false)
-      const darkStored = localStorage.getItem('isDark')
-      if (data?.theme) {
-        if (darkStored === null) {
-          localStorage.setItem('isDark', data.theme.isDark)
-        } else {
-          data.theme.isDark = darkStored === 'true'
-        }
-        dispatch('themeSet', { $vuetify, theme: data.theme })
+      if (data.app) {
+        commit('COMMIT_APP', data.app)
       }
+
+      if (data.theme) {
+        const darkStored = localStorage.getItem('isDark')
+        if (data?.theme) {
+          if (darkStored === null) {
+            localStorage.setItem('isDark', data.theme.isDark)
+          } else {
+            data.theme.isDark = darkStored === 'true'
+          }
+          dispatch('themeSet', { $vuetify, theme: data.theme })
+        }
+      }
+      commit('COMMIT_APPLOADING', false)
     },
     async initBulletinboard({ dispatch, commit }) {
       const endpoint = 'bulletinboard'
@@ -155,6 +166,9 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    COMMIT_APP(state, app) {
+      state.app = { ...app }
+    },
     COMMIT_APPLOADING(state, isLoading) {
       state.appLoading = isLoading
     },

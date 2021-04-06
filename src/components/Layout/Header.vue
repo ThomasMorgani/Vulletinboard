@@ -1,11 +1,20 @@
 <template>
-  <v-app-bar app text color="primary" min-height="1" height="80" max-height="105" @mouseenter="menuShow = !menuShow" @mouseleave="menuShow = !menuShow">
-    <v-toolbar-title @click="menuShow = !menuShow" v-text="title" class="secondary--text logo"></v-toolbar-title>
-    <!-- <template v-slot:img="{ props }">
-      <v-img v-bind="props" contain position="left center" height="100%" min-height="100%" class="banner"></v-img>
-    </template> -->
-    <v-spacer></v-spacer>
-    <v-toolbar-items v-if="showMenu" transition="scroll-y-transition">
+  <v-app-bar
+    app
+    :color="color"
+    min-height="1"
+    :height="height"
+    max-height="105"
+    :src="imageShow"
+    @mouseenter="menuShow = !menuShow"
+    @mouseleave="menuShow = !menuShow"
+    :style="textStyle"
+  >
+    <v-toolbar-title @click="menuShow = !menuShow" v-text="text" class="text-h5"></v-toolbar-title>
+    <template v-slot:img="{ props }">
+      <v-img v-bind="props" contain content-class="imgclass" position="left center" height="100%" min-height="100%" class="banner"></v-img>
+    </template>
+    <v-toolbar-items v-if="showMenu" transition="scroll-y-transition" class="primary">
       <!-- <v-btn text class="secondary--text"> <v-icon left>mdi-plus</v-icon>Add New </v-btn> -->
       <v-btn text class="secondary--text" exact :to="{ name: 'Bulletinboard' }"> <v-icon left>mdi-pin</v-icon>Bulletinboard </v-btn>
       <v-btn text class="secondary--text" :to="{ name: 'Manage' }"> <v-icon left>mdi-clipboard-text</v-icon>Content </v-btn>
@@ -54,26 +63,71 @@
     data: () => ({
       menuShow: false,
       userMenu: false,
-      title: 'VULLETINBOARD',
       titlebarimg: '/images/banner33.jpg',
     }),
     computed: {
-      ...mapGetters(['isAdmin', 'isAuth']),
+      ...mapGetters(['isAdmin', 'isAuth', 'settingsByCat']),
+      color() {
+        return this.isBulletinboard ? this.settings.boardHeaderColor : 'primary'
+      },
+      height() {
+        return this.isBulletinboard ? this.settings.boardHeaderHeight : '80'
+      },
+      imageShow() {
+        if (this.isBulletinboard) {
+          return this.settings.boardHeaderType === 'image' ? this.settings.boardHeaderImage : ''
+        }
+      },
+      isBulletinboard() {
+        return this.$route.name === 'Bulletinboard'
+      },
       showMenu() {
         return this.userMenu || (this.isAuth && this.menuShow)
+      },
+      settings() {
+        return this.$store.state.header
+      },
+      text() {
+        if (this.isBulletinboard) {
+          return this.settings.boardHeaderType === 'image' ? '' : this.settings.boardHeaderText
+        }
+        return this.isBulletinboard ? this.settings.boardHeaderText : this.settingsByCat?.app?.appName?.value || ''
+      },
+      textShow() {
+        return this.$route.name !== 'Bulletinboard' || this.settings.boardHeaderType === 'text'
+      },
+      textStyle() {
+        const align = this.isBulletinboard ? this.settings.boardHeaderContentAlign : 'start'
+        const color = this.isBulletinboard ? this.settings.boardHeaderTextColor : this.theme.secondary
+
+        return {
+          'align-content': 'center',
+          color,
+          'justify-content': align,
+          display: 'flex',
+          width: '100%',
+        }
+      },
+      theme() {
+        const { dark, light } = this.$vuetify.theme.themes
+        return this.isDark ? dark : light
       },
     },
   }
 </script>
-
+c5-r
 <style lang="scss" scoped>
-  ::v-deep .v-toolbar__image {
-    z-index: 1;
+  .imgclass {
+    widows: 20%;
   }
-
   .logo {
     letter-spacing: 0.25rem;
     font-weight: bold;
     font-size: 2.5em;
+  }
+  .v-toolbar__items {
+    position: fixed;
+    top: 0;
+    right: 0;
   }
 </style>

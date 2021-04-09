@@ -5,6 +5,7 @@
     min-height="1"
     :height="height"
     max-height="105"
+    ref="header"
     :src="imageShow"
     @mouseenter="menuShow = !menuShow"
     @mouseleave="menuShow = !menuShow"
@@ -115,7 +116,6 @@
     },
   }
 </script>
-c5-r
 <style lang="scss" scoped>
   .imgclass {
     widows: 20%;

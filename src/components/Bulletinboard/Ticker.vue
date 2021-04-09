@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app bottom color="primary" height="70" class="d-flex align-center">
+  <v-app-bar app bottom color="primary" :height="settings.tickerHeight" ref="ticker" class="d-flex align-center">
     <div class="d-flex flex-column  secondary--text text-no-wrap">
       <p class="text-subtitle-1 ma-0">{{ date }}</p>
       <p class="text-h6 ma-0">{{ time }}</p>
@@ -58,7 +58,6 @@
         }
       },
       feedParse(items = []) {
-        const filters = ['LIVE:', 'WATCH:'] //todo: add this to defaults for abc feed
         let feedStr = ''
         const defaultText = 'Welcome to Vulletinboard!'
         if (!items || items.length < 1) {
@@ -67,7 +66,7 @@
           items.forEach(item => {
             let filterMatch = false
             if (item.title) {
-              filters.forEach(filter => {
+              this.settings.tickerFilter.forEach(filter => {
                 if (item.title.includes(filter)) filterMatch = true
               })
             }
@@ -104,13 +103,13 @@
         let D = now.getDate()
         let Y = now.getFullYear()
         let period = 'AM'
-
         if (h > 12) {
           h = h - 12
           period = 'PM'
         } else {
           period = h === 12 ? 'PM' : 'AM'
         }
+        if (h == 0) h = 12
         this.date = `${M.toString().padStart(2, '0')}/${D.toString().padStart(2, '0')}/${Y}`
         this.time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} ${period}`
       },

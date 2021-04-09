@@ -33,10 +33,31 @@
     components: {
       EventItem,
     },
+    props: ['sheetHeight'],
+
     computed: {
       ...mapState({
+        header: state => state.header,
         items: state => state.items,
+        ticker: state => state.ticker,
       }),
+    },
+    methods: {
+      setHeight() {
+        const defaults = {
+          header: 80,
+          ticker: 70,
+        }
+        const headerHeight = this?.header?.headerHeight || defaults.header
+        const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
+        const adj = 15
+        const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj
+        const list = this.$refs.itemList.$el
+        list.style.setProperty('height', `calc(100vh - ${diff}px)`)
+      },
+    },
+    mounted() {
+      // this.setHeight()
     },
   }
 </script>
@@ -51,7 +72,7 @@
   }
 
   .itemList {
-    height: calc(100vh - 225px); /* TODO: When all values in settings data, calc this is js*/
+    // height: calc(100vh - 225px); /* TODO: When all values in settings data, calc this is js*/
     overflow-y: scroll;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */

@@ -102,6 +102,9 @@ export default new Vuex.Store({
       }
       return response.data
     },
+    headerSet({ commit }, header) {
+      commit('COMMIT_HEADER', header)
+    },
     async init({ commit, dispatch, state }, $vuetify) {
       const data = await dispatch('apiGet', '')
       if (data.app) {
@@ -131,9 +134,7 @@ export default new Vuex.Store({
         }
       }
     },
-    headerSet({ commit }, header) {
-      commit('COMMIT_HEADER', header)
-    },
+
     itemsSet({ commit }, items) {
       commit('COMMIT_ITEMS', items)
     },
@@ -163,6 +164,9 @@ export default new Vuex.Store({
       $vuetify.theme.dark = theme.isDark
       $vuetify.theme.themes.dark = { ...$vuetify.theme.themes.dark, ...theme.dark }
       $vuetify.theme.themes.light = { ...$vuetify.theme.themes.light, ...theme.light }
+    },
+    tickerSet({ commit }, ticker) {
+      commit('COMMIT_TICKER', ticker)
     },
   },
   mutations: {

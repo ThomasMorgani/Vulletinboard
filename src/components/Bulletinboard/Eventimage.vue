@@ -1,8 +1,8 @@
 <template>
-  <v-sheet height="100%" width="70vw" min-width="70vw" class="d-flex align-center justify-center ma-1" color="transparent">
+  <v-sheet height="100%" width="70vw" min-width="70vw" class="d-flex align-center justify-center" color="transparent">
     <v-icon v-show="isError" color="primary" size="100" class="fallbackImage" transition="fade-transition">mdi-image</v-icon>
     <transition name="slide-fade">
-      <v-img contain :src="imgSrc" :key="image" @error="isError = true" class="displayedImage"></v-img>
+      <v-img contain max-height="100%" max-width="100%" :src="imgSrc" :key="image" @error="isError = true" class="displayedImage"></v-img>
     </transition>
   </v-sheet>
 </template>

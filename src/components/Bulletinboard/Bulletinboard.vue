@@ -1,5 +1,5 @@
 <template>
-  <v-sheet :color="settings.backgroundColor" height="100%" width="100%" class="d-flex flex-no-wrap align-start justify-start">
+  <v-sheet :color="settings.boardBackground" height="100%" ref="contentSheet" width="100%" class="contentSheet d-flex flex-no-wrap align-start justify-start">
     <!--EVENT LIST -->
     <EventList v-if="!isLoading" @showNext="itemNext" @showPrevious="itemPrevious" @selectItem="itemSelect"></EventList>
     <!--IMAGE -->
@@ -35,7 +35,9 @@
     computed: {
       ...mapState({
         items: state => state.items,
+        header: state => state.header,
         settings: state => state.board,
+        ticker: state => state.ticker,
       }),
       displayedEventImage() {
         return this.items?.['0']?.content_media
@@ -57,15 +59,6 @@
         this.$store.dispatch('itemsSet', items)
         this.resetInterval(this.itemNext, this.settings.itemTimeout)
       },
-      resetInterval(cb, time) {
-        if (!cb || !time) {
-          return
-        }
-        if (this.intervalId) {
-          clearInterval(this.intervalId)
-        }
-        this.intervalId = setInterval(cb, time)
-      },
       itemNext() {
         if (Array.isArray(this.items)) {
           const items = [...this.items]
@@ -84,6 +77,27 @@
         }
         return
       },
+      resetInterval(cb, time) {
+        if (!cb || !time) {
+          return
+        }
+        if (this.intervalId) {
+          clearInterval(this.intervalId)
+        }
+        this.intervalId = setInterval(cb, time)
+      },
+      setHeight() {
+        const defaults = {
+          header: 80,
+          ticker: 70,
+        }
+        const headerHeight = this?.header?.headerHeight || defaults.header
+        const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
+        const adj = 5
+        const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj
+        const list = this.$refs.contentSheet.$el
+        list.style.setProperty('height', `calc(100vh - ${diff}px)`)
+      },
     },
     async created() {
       this.init()
@@ -92,10 +106,16 @@
     beforeDestroy() {
       clearInterval(this.intervalId)
     },
+    mounted() {
+      this.setHeight()
+    },
   }
 </script>
 
 <style scoped>
+  .contentSheet {
+    overflow: hidden;
+  }
   .fade-enter-active {
     transition: all 0.3s ease;
   }

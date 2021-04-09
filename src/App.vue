@@ -29,6 +29,7 @@
     computed: {
       ...mapState({
         appLoading: state => state.appLoading,
+        settings: state => state.settings,
         snackbarStore: state => state.snackbar,
         ticker: state => state.ticker,
       }),
@@ -46,7 +47,9 @@
         },
       },
       tickerShow() {
-        return this.$route.name === 'Bulletinboard' && this?.ticker?.tickerShow
+        if (this.$route.name === 'Bulletinboard') return this?.ticker?.tickerShow
+        if (this.$route.name === 'Settings') return this?.ticker?.tickerPreview
+        return false
       },
     },
     mounted() {

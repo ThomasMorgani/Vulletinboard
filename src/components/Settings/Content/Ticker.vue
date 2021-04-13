@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="">
+  <v-card outlined class="" v-if="!loading">
     <v-card-title class="text-h5 primary--text">
       Ticker
     </v-card-title>
@@ -13,22 +13,22 @@
           <v-switch color v-model="show" :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" class="mt-0"> </v-switch>
         </v-card-text>
       </v-card>
-      <v-card :disabled="!show" flat width="100%" class="">
+      <v-card :disabled="loading || !show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
           {{ tickerSettings.tickerColor.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerColor.description }}</p>
-          <Colorpicker @input="color = $event.hexa" :btnProps="{ color: color, label: '     ', value: color }"></Colorpicker>
+          <Colorpicker @input="setColor" :btnProps="{ color: color, label: '     ', value: color }"></Colorpicker>
         </v-card-text>
       </v-card>
-      <v-card flat width="100%" class="" :disabled="!show">
+      <v-card flat width="100%" class="" :disabled="loading || !show">
         <v-card-title class="text-h5 primary--text">
           {{ tickerSettings.tickerFeed.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerFeed.description }}</p>
-          <v-select color v-model="feed" :items="feedOptions" item-value="id">
+          <v-select color v-model="feed" :items="feedOptions" item-text="label" item-value="id">
             <template #append-outer>
               <v-btn small icon color="primary" :href="feedUrl()" target="_blank">
                 <v-icon>mdi-open-in-new</v-icon>
@@ -37,7 +37,7 @@
           </v-select>
         </v-card-text>
       </v-card>
-      <v-card :disabled="!show" flat width="100%" class="">
+      <v-card :disabled="loading || !show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
           {{ tickerSettings.tickerFilter.label }}
         </v-card-title>
@@ -52,36 +52,36 @@
           </v-combobox>
         </v-card-text>
       </v-card>
-      <v-card :disabled="!show" flat width="100%" class="">
+      <v-card :disabled="loading || !show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
           {{ tickerSettings.tickerHeight.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerHeight.description }}</p>
-          <v-text-field v-model="height" color="primary" type="number" min="0"></v-text-field>
+          <v-text-field v-model="height" color="primary" type="number" min="0" @input="setHeight"></v-text-field>
         </v-card-text>
       </v-card>
-      <v-card :disabled="!show" flat width="100%" class="">
+      <v-card :disabled="loading || !show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text">
           {{ tickerSettings.tickerSpeed.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerSpeed.description }}</p>
           <v-sheet color="transparent" width="50%" class="mt-4">
-            <v-slider v-model="speed" color="primary" :max="5" :min="1" step="1" thumb-color="primary" thumb-label="always" ticks="always">
+            <v-slider v-model="speed" color="primary" :max="5" :min="1" step="1" thumb-color="primary" thumb-label="always" ticks="always" @change="setSpeed">
               <template #append>fast</template>
               <template #prepend>slow</template>
             </v-slider>
           </v-sheet>
         </v-card-text>
       </v-card>
-      <v-card :disabled="!show" flat width="100%" class="">
+      <v-card :disabled="loading || !show" flat width="100%" class="">
         <v-card-title class="text-h5 primary--text pb-2">
           {{ tickerSettings.tickerTextColor.label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerTextColor.description }}</p>
-          <Colorpicker @input="textColor = $event.hexa" :btnProps="{ color: textColor, label: '     ', value: textColor }"></Colorpicker>
+          <Colorpicker @input="setTextColor" :btnProps="{ color: textColor, label: '     ', value: textColor }"></Colorpicker>
         </v-card-text>
       </v-card>
     </v-card-text>
@@ -89,7 +89,10 @@
       <v-btn tile color="success" :disabled="actionDisabled" width="150" @click="saveTicker">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
       <v-spacer></v-spacer>
-      <v-btn tile :disabled="actionDisabled" color="primary" @click="toggleTicker">PREVIEW </v-btn>
+      <v-btn tile :disabled="actionDisabled" :color="tickerPreview ? 'primary' : 'disabled'" @click="toggleTicker" class="font-weight-bold ">
+        <v-icon left>{{ `mdi-${tickerPreview ? 'eye' : 'eye-off'}` }}</v-icon
+        >PREVIEW
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -102,23 +105,51 @@
     components: { Colorpicker },
     data: () => ({
       color: null,
+      currentSettings: {
+        color: null,
+        feed: null,
+        filter: null,
+        height: null,
+        show: null,
+        speed: null,
+        textColor: null,
+      },
       feed: null,
-      feedOptions: [
-        {
-          id: 1,
-          text: 'ABC NEWS',
-          value: 'https://abcnews.go.com/abcnews/topstories',
-        },
-      ],
+      feedOptions: [],
+      // feedOptions: [
+      //   {
+      //     id: 1,
+      //     text: 'ABC NEWS',
+      //     value: 'https://abcnews.go.com/abcnews/topstories',
+      //   },
+      // ],
       filter: ['LIVE:', 'WATCH:'],
       height: null,
+      loading: true,
+      loadingSave: false,
       show: true,
       speed: 1,
       textColor: null,
     }),
     computed: {
       actionDisabled() {
-        return !this.show
+        const settings = {
+          color: this.color,
+          feed: this.feed,
+          filter: JSON.stringify(this.filter),
+          height: this.height,
+          show: this.show,
+          speed: this.speed,
+          textColor: this.textColor,
+        }
+        console.log(settings)
+        console.log(this.currentSettings)
+        const isChanged = JSON.stringify(settings) === JSON.stringify(this.currentSettings)
+        return isChanged || this.loadingSave
+      },
+
+      tickerPreview() {
+        return this.$store?.state?.ticker?.tickerPreview || false
       },
       tickerSettings() {
         return this?.$store?.getters?.settingsByCat?.ticker || {}
@@ -132,8 +163,8 @@
       revertSettings() {
         const currentSettings = {
           color: this.tickerSettings.tickerColor.value,
-          feed: parseInt(this.tickerSettings.tickerFeed.value),
-          filter: this.tickerSettings.tickerFilter.value ? JSON.parse(this.tickerSettings.tickerFilter.value) : [],
+          feed: this.tickerSettings.tickerFeed.value,
+          filter: this.tickerSettings.tickerFilter.value ? this.tickerSettings.tickerFilter.value : [],
           height: this.tickerSettings.tickerHeight.value,
           show: this.tickerSettings.tickerShow.value,
           speed: this.tickerSettings.tickerSpeed.value,
@@ -151,7 +182,7 @@
           tickerColor: this.color,
           tickerFeed: this.feed,
           tickerFilter: JSON.stringify(this.filter),
-          tickerImage: this.height,
+          tickerHeight: this.height,
           tickerShow: this.show,
           tickerText: this.speed,
           tickerTextColor: this.textColor,
@@ -166,6 +197,20 @@
         const { status: color, message } = resp
         this.$store.dispatch('snackbar', { color, message, value: true })
       },
+      setColor(e = null) {
+        this.color = e.hexa || e
+        this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerColor: this.color })
+      },
+      setHeight(e) {
+        this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerHeight: this.height })
+      },
+      setSpeed(e) {
+        this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerSpeed: this.speed })
+      },
+      setTextColor(e = null) {
+        this.textColor = e.hexa || e
+        this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerTextColor: this.textColor })
+      },
       sortFilter() {
         this.filter = this.filter.sort((a, b) => a > b)
       },
@@ -175,17 +220,19 @@
           tickerFeed: this.feed,
           tickerFilter: this.filter,
           tickerImage: this.height,
-          tickerRss: this.feedOptions.find(f => f.id === this.feed).value,
+          tickerRss: this.feedOptions.find(f => f.id === this.feed).rss,
           tickerShow: this.show,
-          tickerText: this.speed,
+          tickerSpeed: this.speed,
           tickerTextColor: this.textColor,
         }
-        const tickerPreview = !this.$store?.state?.ticker?.tickerPreview || false
-        this.$store.dispatch('tickerSet', { ...ticker, tickerPreview })
+        this.$store.dispatch('tickerSet', { ...ticker, tickerPreview: !this.tickerPreview })
       },
     },
-    mounted() {
+    created() {},
+    async mounted() {
+      this.feedOptions = await this.$store.dispatch('apiGet', 'manage/settings/feed')
       this.revertSettings()
+      this.loading = false
     },
   }
 </script>

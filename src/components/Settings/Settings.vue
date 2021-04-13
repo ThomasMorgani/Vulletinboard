@@ -1,5 +1,5 @@
 <template>
-  <v-card flat tile class="mx-0 pb-4" v-if="!isLoading">
+  <v-card v-if="!isLoading" flat tile v-scroll="onPageScroll" class="mx-0 pb-4">
     <v-card-title class="titleTabs  pa-0">
       <v-tabs v-model="tabs" @change="onTabChange" class="text-center px-0">
         <v-tab href="#settings"> <v-icon left> mdi-cog </v-icon> APP </v-tab>
@@ -36,24 +36,42 @@
     components: { ColorsSettings, ContentSettings, GeneralSettings },
     data: () => ({
       isLoading: true,
+      isScrolling: true,
       tabs: 'settings',
     }),
     methods: {
+      onPageScroll(e) {
+        if (this.isScrolling) return 'isLoading'
+        this.isScrolling = true
+        const timeout = setTimeout(() => {
+          const scroll = document.documentElement.scrollTop || 0
+          localStorage.setItem('lastScroll', scroll)
+          const saved = parseInt(localStorage.getItem('lastScroll')) || 0
+          this.isScrolling = false
+        }, 1000)
+      },
       onTabChange(e) {
-        console.log(e)
         localStorage.setItem('settingsView', e)
       },
     },
-    async created() {
+    async mounted() {
       const view = localStorage.getItem('settingsView')
       if (view) {
         this.tabs = view
       }
       const settings = await this.$store.dispatch('apiGet', 'manage/settings')
       if (settings) {
-        this.$store.dispatch('settingsSet', settings)
+        await this.$store.dispatch('settingsSet', settings)
       }
       this.isLoading = false
+      const scroll = parseInt(localStorage.getItem('lastScroll')) || 0
+      setTimeout(() => (document.documentElement.scrollTop = scroll), 500)
+      document.documentElement.scrollTo({
+        top: scroll,
+        left: 0,
+        behavior: 'smooth',
+      })
+      this.isScrolling = false
     },
   }
 </script>

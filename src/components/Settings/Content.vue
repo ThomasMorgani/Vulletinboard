@@ -1,7 +1,7 @@
 <template>
   <v-card tile width="100%">
     <v-card-text>
-      <Background width="100%" class="my-1"></Background>
+      <Background ref="settings" width="100%" class="my-1"></Background>
       <Header width="100%" class="my-1"></Header>
       <Item class="my-1"></Item>
       <Ticker class="my-1"></Ticker>
@@ -17,6 +17,8 @@
   export default {
     name: 'ContentSettings',
     components: { Background, Header, Item, Ticker },
+    methods: {},
+    mounted() {},
   }
 </script>
 

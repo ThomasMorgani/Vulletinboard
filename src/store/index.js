@@ -139,12 +139,19 @@ export default new Vuex.Store({
       commit('COMMIT_ITEMS', items)
     },
     settingsSet({ commit, state }, settingsValues) {
-      let settings = {}
-      for (let setting in settingsValues) {
-        const isObject = typeof settingsValues[setting] === 'object' && settingsValues[setting] !== null
-        settings[setting] = isObject ? { ...settingsValues[setting] } : { ...state.settings[setting], value: settingsValues[setting] }
-      }
-      commit('COMMIT_SETTINGS', { ...state.settings, ...settings })
+      return new Promise((res, rej) => {
+        let settings = {}
+        for (let setting in settingsValues) {
+          const isObject = typeof settingsValues[setting] === 'object' && settingsValues[setting] !== null
+          settings[setting] = isObject ? { ...settingsValues[setting] } : { ...state.settings[setting], value: settingsValues[setting] }
+        }
+        if (settings.tickerFilter) {
+          if (settings.tickerFilter.value && typeof settings.tickerFilter.value === 'string') settings.tickerFilter.value = JSON.parse(settings.tickerFilter.value)
+          if (settings.tickerFilter && typeof settings.tickerFilter === 'string') settings.tickerFilter = JSON.parse(settings.tickerFilter)
+        }
+        commit('COMMIT_SETTINGS', { ...state.settings, ...settings })
+        res()
+      })
     },
     snackbar({ commit, state }, { color, message, value }) {
       // toggleSnackbar(color, message, value) {

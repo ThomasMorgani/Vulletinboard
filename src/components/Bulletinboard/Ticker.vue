@@ -1,11 +1,11 @@
 <template>
-  <v-app-bar app bottom color="primary" :height="settings.tickerHeight" ref="ticker" class="d-flex align-center">
-    <div class="d-flex flex-column  secondary--text text-no-wrap">
+  <v-app-bar app bottom :color="settings.tickerColor" :height="settings.tickerHeight" ref="ticker" class="d-flex align-center" :style="{ color: settings.tickerTextColor }">
+    <div class="d-flex flex-column  text-no-wrap">
       <p class="text-subtitle-1 ma-0">{{ date }}</p>
       <p class="text-h6 ma-0">{{ time }}</p>
     </div>
     <v-divider vertical dark class="px-2"></v-divider>
-    <v-icon class="flex-shrink-1 px-4" color="white">mdi mdi-newspaper</v-icon>
+    <v-icon class="flex-shrink-1 px-4" :color="settings.tickerTextColor">mdi mdi-newspaper</v-icon>
 
     <div class="newsFeedDiv">
       <!-- <font class="text-white headline pr-1">HEADLINES:</font> -->
@@ -185,7 +185,7 @@
     // padding-left: 100%;
   }
   .marquee-text {
-    color: white;
+    // color: white;
     font-size: x-large;
   }
 

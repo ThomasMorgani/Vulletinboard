@@ -185,4 +185,8 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .v-input {
+    width: 600px;
+  }
+</style>

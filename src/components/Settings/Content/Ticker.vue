@@ -43,11 +43,71 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerFilter.description }}</p>
-          <v-combobox v-model="filter" @change="sortFilter" chips clearable color="primary" deletable-chips full-width item-color="primary" multiple>
+          <v-combobox
+            v-model="filter"
+            @change="filterFormat"
+            chips
+            clearable
+            color="primary"
+            deletable-chips
+            full-width
+            :items="[...filterKeywords, ...filter]"
+            item-color="primary"
+            multiple
+          >
             <template #selection="data">
-              <v-chip color="primary" close :key="JSON.stringify(data.item)" v-bind="data.attrs" :input-value="data.selected">
+              <v-chip color="primary" close :key="JSON.stringify(data.item)" v-bind="data.attrs" :input-value="data.selected" @click:close="filterRemoveItem(data.item)">
                 {{ data.item }}
               </v-chip>
+            </template>
+            <template #append-outer>
+              <v-menu v-model="filterDefaultsMenu" :close-on-click="false" :close-on-content-click="false" offset-x>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="primary" icon v-bind="attrs" v-on="on">
+                    <v-icon color="">mdi-filter-variant-plus</v-icon>
+                  </v-btn>
+                </template>
+
+                <v-card width="400">
+                  <v-card-title class="d-flex flex-column align-start">
+                    <p class="text-h5 primary--text pa-0 ma-0">Recommended filters</p>
+                    <p class="text-caption pa-0 ma-0">For: {{ feedOptions.find(f => f.id == feed).label || '' }}</p>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text class="d-flex align-start justify-start">
+                    <p v-if="!filterDefaults">There are no recommended filters for this feed.</p>
+                    <v-tooltip v-for="filter in filterDefaults" :key="filter.text" color="primary" :disabled="!filter.disabled" top>
+                      <template v-slot:activator="{ attrs, on }">
+                        <div v-bind="attrs" v-on="on">
+                          <v-chip
+                            close
+                            close-icon="mdi-plus-circle"
+                            close-label="Add"
+                            color="primary"
+                            @click:close="filterAddItem(filter.text)"
+                            :disabled="filter.disabled"
+                            class="mr-2"
+                          >
+                            {{ filter.text }}
+                          </v-chip>
+                        </div>
+                      </template>
+                      <span>Already added</span>
+                    </v-tooltip>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn color="primary" :disabled="filterAddAllDisabled" text @click="filterAddItemMany(filterDefaults)">
+                      <v-icon left>mdi-plus</v-icon>
+                      ADD ALL
+                    </v-btn>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="error" text @click="filterDefaultsMenu = false">
+                      CLOSE
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-menu>
             </template>
           </v-combobox>
         </v-card-text>
@@ -68,7 +128,7 @@
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ tickerSettings.tickerSpeed.description }}</p>
           <v-sheet color="transparent" width="50%" class="mt-4">
-            <v-slider v-model="speed" color="primary" :max="5" :min="1" step="1" thumb-color="primary" thumb-label="always" ticks="always" @change="setSpeed">
+            <v-slider v-model="speed" color="primary" :max="6" :min="1" :step="1" thumb-color="primary" thumb-label="always" ticks="always" @change="setSpeed">
               <template #append>fast</template>
               <template #prepend>slow</template>
             </v-slider>
@@ -89,7 +149,7 @@
       <v-btn tile color="success" :disabled="actionDisabled" width="150" @click="saveTicker">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
       <v-spacer></v-spacer>
-      <v-btn tile :disabled="actionDisabled" :color="tickerPreview ? 'primary' : 'disabled'" @click="toggleTicker" class="font-weight-bold ">
+      <v-btn tile :color="tickerPreview ? 'primary' : 'disabled'" @click="toggleTicker" class="font-weight-bold ">
         <v-icon left>{{ `mdi-${tickerPreview ? 'eye' : 'eye-off'}` }}</v-icon
         >PREVIEW
       </v-btn>
@@ -123,7 +183,9 @@
       //     value: 'https://abcnews.go.com/abcnews/topstories',
       //   },
       // ],
-      filter: ['LIVE:', 'WATCH:'],
+      filter: [],
+      filterDefaultsMenu: false,
+      filterKeywords: [],
       height: null,
       loading: true,
       loadingSave: false,
@@ -139,15 +201,25 @@
           filter: JSON.stringify(this.filter),
           height: this.height,
           show: this.show,
-          speed: this.speed,
+          speed: +this.speed,
           textColor: this.textColor,
         }
-        console.log(settings)
-        console.log(this.currentSettings)
-        const isChanged = JSON.stringify(settings) === JSON.stringify(this.currentSettings)
+        const isChanged = JSON.stringify(settings) === JSON.stringify({ ...this.currentSettings, filter: JSON.stringify(this.currentSettings.filter) })
         return isChanged || this.loadingSave
       },
-
+      filterAddAllDisabled() {
+        let availableFilters = true
+        this.filterDefaults.forEach(df => {
+          if (this.filter.indexOf(df.text) < 0) availableFilters = false
+        })
+        return availableFilters
+      },
+      filterDefaults() {
+        const defaultFilters = this.feedOptions.find(f => f.id == this.feed).filter || []
+        const filters = defaultFilters.map(f => ({ text: f, disabled: this.filter.indexOf(f.toUpperCase()) > -1 }))
+        return filters
+      },
+      filterAutocomplete() {},
       tickerPreview() {
         return this.$store?.state?.ticker?.tickerPreview || false
       },
@@ -160,14 +232,31 @@
         return '#'
         //feedOptions.find(f => f.id === feed).value
       },
+      filterAddItem(filter) {
+        this.filter = [...this.filter, filter]
+        this.filterFormat()
+      },
+      filterAddItemMany(filters = []) {
+        filters.forEach(f => (this.filter = [...this.filter, f.text ? f.text : f]))
+        this.filterFormat()
+      },
+      filterFormat() {
+        const filter = this.filter.map(i => i.toUpperCase()).sort((a, b) => a > b)
+        this.filter = Array.from(new Set(filter))
+        const keywords = [...this.filterKeywords, ...filter].map(i => i.toUpperCase()).sort((a, b) => a > b)
+        this.filterKeywords = Array.from(new Set(keywords))
+      },
+      filterRemoveItem(item) {
+        this.filter = [...this.filter.filter(i => i !== item)]
+      },
       revertSettings() {
         const currentSettings = {
           color: this.tickerSettings.tickerColor.value,
           feed: this.tickerSettings.tickerFeed.value,
-          filter: this.tickerSettings.tickerFilter.value ? this.tickerSettings.tickerFilter.value : [],
+          filter: this.tickerSettings.tickerFilter.value || [],
           height: this.tickerSettings.tickerHeight.value,
           show: this.tickerSettings.tickerShow.value,
-          speed: this.tickerSettings.tickerSpeed.value,
+          speed: +this.tickerSettings.tickerSpeed.value,
           textColor: this.tickerSettings.tickerTextColor.value,
         }
         for (let setting in currentSettings) {
@@ -202,6 +291,7 @@
         this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerColor: this.color })
       },
       setHeight(e) {
+        console.log(e)
         this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerHeight: this.height })
       },
       setSpeed(e) {
@@ -211,9 +301,7 @@
         this.textColor = e.hexa || e
         this.$store.dispatch('tickerSet', { ...this.$store.state.ticker, tickerTextColor: this.textColor })
       },
-      sortFilter() {
-        this.filter = this.filter.sort((a, b) => a > b)
-      },
+
       toggleTicker() {
         const ticker = {
           tickerColor: this.color,
@@ -230,11 +318,17 @@
     },
     created() {},
     async mounted() {
-      this.feedOptions = await this.$store.dispatch('apiGet', 'manage/settings/feed')
+      const data = await this.$store.dispatch('apiGet', 'manage/settings/feed')
+      this.feedOptions = data?.feedOptions ? data.feedOptions.map(o => ({ ...o, filter: JSON.parse(o.filter) })) : []
+      this.filterKeywords = data?.filterKeywords ? [...data.filterKeywords] : []
       this.revertSettings()
       this.loading = false
     },
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .v-input {
+    width: 600px;
+  }
+</style>

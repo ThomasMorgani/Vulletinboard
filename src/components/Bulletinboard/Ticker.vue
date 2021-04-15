@@ -67,7 +67,7 @@
             let filterMatch = false
             if (item.title) {
               this.settings.tickerFilter.forEach(filter => {
-                if (item.title.includes(filter)) filterMatch = true
+                if (item.title.toLowerCase().includes(filter.toLowerCase())) filterMatch = true
               })
             }
             if (!filterMatch) feedStr += feedStr === '' ? item.title : ' • ' + item.title
@@ -91,6 +91,7 @@
           3: 'three',
           4: 'four',
           5: 'five',
+          6: 'six',
         }
         return speeds[this.settings.tickerSpeed] || 'three'
       },
@@ -182,6 +183,11 @@
   .marquee p.five {
     display: inline-block;
     animation: marquee 150s linear infinite;
+    // padding-left: 100%;
+  }
+  .marquee p.six {
+    display: inline-block;
+    animation: marquee 90s linear infinite;
     // padding-left: 100%;
   }
   .marquee-text {

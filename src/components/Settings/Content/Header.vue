@@ -10,7 +10,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ boardSettings.boardHeaderShow.description }}</p>
-          <v-switch v-model="show" color hide-details :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" class="mt-0"> </v-switch>
+          <v-switch v-model="show" color hide-details :prepend-icon="show ? 'mdi-eye' : 'mdi-eye-off'" @change="toggleShow" class="mt-0"> </v-switch>
         </v-card-text>
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
@@ -28,7 +28,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ boardSettings.boardHeaderHeight.description }}</p>
-          <v-text-field v-model="height" color="primary" type="number" min="0"></v-text-field>
+          <v-text-field v-model="headerHeight" color="primary" type="number" min="0"></v-text-field>
         </v-card-text>
       </v-card>
       <v-card :disabled="!show" flat width="100%" class="">
@@ -37,7 +37,8 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ boardSettings.boardHeaderType.description }}</p>
-          <v-select color v-model="type" :items="typeOptions" :messages="type === 'text' ? 'Solid color with text.' : 'Select an image to use as a image.'"> </v-select>
+          <v-select color v-model="type" :items="typeOptions" :messages="type === 'text' ? 'Solid color with text.' : 'Select an image to use as a image.'" @change="setType">
+          </v-select>
         </v-card-text>
       </v-card>
       <v-card v-if="type === 'image'" :disabled="!show" flat width="100%" class="">
@@ -56,7 +57,7 @@
           </v-card-title>
           <v-card-text class="d-flex flex-column align-start">
             <p>{{ boardSettings.boardHeaderText.description }}</p>
-            <v-text-field v-model="text" color="primary" messages="Enter display text" prepend-inner-icon="mdi-format-text"></v-text-field>
+            <v-text-field v-model="headerText" color="primary" messages="Enter display text" prepend-inner-icon="mdi-format-text"></v-text-field>
           </v-card-text>
         </v-card>
         <v-card :disabled="!show" flat width="100%" class="">
@@ -83,16 +84,23 @@
     <v-card-actions class="pa-4">
       <v-btn tile color="success" :disabled="actionDisabled" :loading="loadingSave" width="150" @click="saveHeader">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
+      <v-spacer></v-spacer>
+      <IconTooltip v-if="!show && preview" v-bind="{ iconOpts: { color: 'warning', left: true }, tooltipOpts: { text: 'Header is configured to be hidden' } }"></IconTooltip>
+      <v-btn tile :color="preview ? 'primary' : 'disabled'" @click="togglePreview" class="font-weight-bold ">
+        <v-icon left>{{ `mdi-${preview ? 'eye' : 'eye-off'}` }}</v-icon
+        >PREVIEW
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
   import Colorpicker from '@/components/Controls/PickerColor'
+  import IconTooltip from '@/components/Controls/IconTooltip'
 
   export default {
     name: 'SettingHeader',
-    components: { Colorpicker },
+    components: { Colorpicker, IconTooltip },
     data: () => ({
       align: 'start',
       alignOptions: ['start', 'center', 'end'],
@@ -108,6 +116,7 @@
       height: null,
       image: null,
       loadingSave: false,
+      preview: false,
       show: true,
       text: null,
       textColor: null,
@@ -132,8 +141,52 @@
       boardSettings() {
         return this?.$store?.getters?.settingsByCat?.board || {}
       },
+      headerHeight: {
+        get() {
+          return this.height
+        },
+        set(v) {
+          this.height = v
+          this.$store.dispatch('headerSet', { ...this.$store.state.header, headerHeight: v })
+        },
+      },
+      headerText: {
+        get() {
+          return this.text
+        },
+        set(v) {
+          this.text = v
+          this.$store.dispatch('headerSet', { ...this.$store.state.header, headerText: v })
+        },
+      },
     },
     methods: {
+      formatHeaderSettings() {
+        const data = {
+          headerColor: this.color,
+          headerContentAlign: this.align,
+          headerHeight: this.height,
+          headerImage: this.image,
+          headerShow: this.show,
+          headerText: this.text,
+          headerTextColor: this.textColor,
+          headerType: this.type,
+        }
+        return data
+      },
+      formatBoardHeaderSettings() {
+        const data = {
+          boardHeaderColor: this.color,
+          boardHeaderContentAlign: this.align,
+          boardHeaderHeight: this.height,
+          boardHeaderImage: this.image,
+          boardHeaderShow: this.show,
+          boardHeaderText: this.text,
+          boardHeaderTextColor: this.textColor,
+          boardHeaderType: this.type,
+        }
+        return data
+      },
       revertSettings() {
         const currentSettings = {
           align: this.boardSettings.boardHeaderContentAlign.value,
@@ -149,19 +202,12 @@
           this[setting] = currentSettings[setting]
         }
         this.currentSettings = { ...currentSettings }
+        const settingsHeader = this.formatHeaderSettings()
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, ...settingsHeader })
       },
       async saveHeader() {
         console.log('saveHeader')
-        const postData = {
-          boardHeaderColor: this.color,
-          boardHeaderContentAlign: this.align,
-          boardHeaderHeight: this.height,
-          boardHeaderImage: this.image,
-          boardHeaderShow: this.show,
-          boardHeaderText: this.text,
-          boardHeaderTextColor: this.textColor,
-          boardHeaderType: this.type,
-        }
+        const postData = this.formatBoardHeaderSettings()
         this.loadingSave = true
         const resp = await this.$store.dispatch('apiPost', { endpoint: 'manage/settings/header', postData })
         if (resp.status === 'success') {
@@ -173,10 +219,41 @@
         this.$store.dispatch('snackbar', { color, message, value: true })
       },
       setColor(e) {
+        console.log(e)
         this.color = e
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerColor: this.color })
+      },
+      setHeight() {
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerHeight: this.height })
+      },
+      setText() {
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerText: this.text })
       },
       setTextColor(e) {
         this.textColor = e
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerTextColor: this.textColor })
+      },
+      setType() {
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerType: this.type })
+      },
+      togglePreview() {
+        this.preview = !this.preview
+
+        const header = {
+          headerAlign: this.ContentAlign,
+          headerColor: this.color,
+          headerHeight: this.height,
+          headerImage: this.image,
+          headerShow: this.show,
+          headerText: this.text,
+          headerTextColor: this.textColor,
+          headerType: this.type,
+        }
+        this.$store.dispatch('headerSet', { ...header, headerPreview: this.preview })
+      },
+      toggleShow(e) {
+        this.show = e
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerShow: this.show })
       },
     },
     created() {

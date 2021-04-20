@@ -12,7 +12,7 @@
     :style="textStyle"
   >
     <v-toolbar-title @click="menuShow = !menuShow" v-text="text" class="text-h5"></v-toolbar-title>
-    <template v-slot:img="{ props }">
+    <template v-slot:img="{ props }" v-if="imageShow">
       <v-img v-bind="props" contain content-class="imgclass" position="left center" height="100%" min-height="100%" class="banner"></v-img>
     </template>
     <v-toolbar-items v-if="showMenu" transition="scroll-y-transition" class="primary">
@@ -69,18 +69,18 @@
     computed: {
       ...mapGetters(['isAdmin', 'isAuth', 'settingsByCat']),
       color() {
-        return this.isBulletinboard ? this.settings.boardHeaderColor : 'primary'
+        return this.isBulletinboard ? this.settings.headerColor : 'primary'
       },
       height() {
-        return this.isBulletinboard ? this.settings.boardHeaderHeight : '80'
+        return this.isBulletinboard ? this.settings.headerHeight : '80'
       },
       imageShow() {
         if (this.isBulletinboard) {
-          return this.settings.boardHeaderType === 'image' ? this.settings.boardHeaderImage : ''
+          return this.settings.headerType === 'image' ? this.settings.headerImage : ''
         }
       },
       isBulletinboard() {
-        return this.$route.name === 'Bulletinboard'
+        return this.settings.headerShow && this?.settings?.headerPreview
       },
       showMenu() {
         return this.userMenu || (this.isAuth && this.menuShow)
@@ -90,16 +90,16 @@
       },
       text() {
         if (this.isBulletinboard) {
-          return this.settings.boardHeaderType === 'image' ? '' : this.settings.boardHeaderText
+          return this.settings.headerType === 'image' ? '' : this.settings.headerText
         }
-        return this.isBulletinboard ? this.settings.boardHeaderText : this.settingsByCat?.app?.appName?.value || ''
+        return this.isBulletinboard ? this.settings.headerText : this.settingsByCat?.app?.appName?.value || ''
       },
       textShow() {
-        return this.$route.name !== 'Bulletinboard' || this.settings.boardHeaderType === 'text'
+        return this.$route.name !== 'Bulletinboard' || this.settings.headerType === 'text'
       },
       textStyle() {
-        const align = this.isBulletinboard ? this.settings.boardHeaderContentAlign : 'start'
-        const color = this.isBulletinboard ? this.settings.boardHeaderTextColor : this.theme.secondary
+        const align = this.isBulletinboard ? this.settings.headerAlign : 'start'
+        const color = this.isBulletinboard ? this.settings.headerTextColor : this.theme.secondary
 
         return {
           'align-content': 'center',
@@ -124,6 +124,9 @@
     letter-spacing: 0.25rem;
     font-weight: bold;
     font-size: 2.5em;
+  }
+  >>> .v-toolbar__content {
+    width: 100%;
   }
   .v-toolbar__items {
     position: fixed;

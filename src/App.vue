@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <Header></Header>
+    <component :is="headerShown"></component>
     <v-main :style="mainStyle">
       <v-progress-circular v-if="appLoading" color="primary" indeterminate></v-progress-circular>
       <router-view v-else />
@@ -23,16 +23,25 @@
   export default {
     name: 'Vulletinboard',
     components: {
+      BoardHeader: () => import('@/components/Bulletinboard/Header'),
       Header: () => import('@/components/Layout/Header'),
       Ticker,
     },
     computed: {
       ...mapState({
         appLoading: state => state.appLoading,
+        headerSettings: state => state.header,
         settings: state => state.settings,
         snackbarStore: state => state.snackbar,
         ticker: state => state.ticker,
       }),
+      headerShown() {
+        return this.isBulletinboard ? 'BoardHeader' : 'Header'
+      },
+      isBulletinboard() {
+        if (this.$route.name === 'Bulletinboard') return true
+        return this.headerSettings?.boardHeaderPreview && this.headerSettings?.boardHeaderShow
+      },
       mainStyle() {
         return {
           // background: 'black',

@@ -77,7 +77,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column align-start">
           <p>{{ boardSettings.boardHeaderContentAlign.description }}</p>
-          <v-select v-model="align" color="primary" :items="alignOptions"></v-select>
+          <v-select v-model="align" color="primary" :items="alignOptions" @change="setAlignment"></v-select>
         </v-card-text>
       </v-card>
     </v-card-text>
@@ -128,10 +128,10 @@
         const settings = {
           align: this.align,
           color: this.color,
-          content: this.content,
           height: this.height,
           image: this.image,
           show: this.show,
+          text: this.text,
           textColor: this.textColor,
           type: this.type,
         }
@@ -147,7 +147,7 @@
         },
         set(v) {
           this.height = v
-          this.$store.dispatch('headerSet', { ...this.$store.state.header, headerHeight: v })
+          this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderHeight: v })
         },
       },
       headerText: {
@@ -156,7 +156,7 @@
         },
         set(v) {
           this.text = v
-          this.$store.dispatch('headerSet', { ...this.$store.state.header, headerText: v })
+          this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderText: v })
         },
       },
     },
@@ -202,7 +202,7 @@
           this[setting] = currentSettings[setting]
         }
         this.currentSettings = { ...currentSettings }
-        const settingsHeader = this.formatHeaderSettings()
+        const settingsHeader = this.formatBoardHeaderSettings()
         this.$store.dispatch('headerSet', { ...this.$store.state.header, ...settingsHeader })
       },
       async saveHeader() {
@@ -218,42 +218,45 @@
         const { status: color, message } = resp
         this.$store.dispatch('snackbar', { color, message, value: true })
       },
+      setAlignment(e) {
+        this.align = e
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderContentAlign: this.align })
+      },
       setColor(e) {
-        console.log(e)
         this.color = e
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerColor: this.color })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderColor: this.color })
       },
       setHeight() {
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerHeight: this.height })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderHeight: this.height })
       },
       setText() {
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerText: this.text })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderText: this.text })
       },
       setTextColor(e) {
         this.textColor = e
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerTextColor: this.textColor })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderTextColor: this.textColor })
       },
       setType() {
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerType: this.type })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderType: this.type })
       },
       togglePreview() {
         this.preview = !this.preview
 
         const header = {
-          headerAlign: this.ContentAlign,
-          headerColor: this.color,
-          headerHeight: this.height,
-          headerImage: this.image,
-          headerShow: this.show,
-          headerText: this.text,
-          headerTextColor: this.textColor,
-          headerType: this.type,
+          boardHeaderContentAlign: this.align,
+          boardHeaderColor: this.color,
+          boardHeaderHeight: this.height,
+          boardHeaderImage: this.image,
+          boardHeaderShow: this.show,
+          boardHeaderText: this.text,
+          boardHeaderTextColor: this.textColor,
+          boardHeaderType: this.type,
         }
-        this.$store.dispatch('headerSet', { ...header, headerPreview: this.preview })
+        this.$store.dispatch('headerSet', { ...header, boardHeaderPreview: this.preview })
       },
       toggleShow(e) {
         this.show = e
-        this.$store.dispatch('headerSet', { ...this.$store.state.header, headerShow: this.show })
+        this.$store.dispatch('headerSet', { ...this.$store.state.header, boardHeaderShow: this.show })
       },
     },
     created() {

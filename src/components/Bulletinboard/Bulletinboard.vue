@@ -91,7 +91,9 @@
           header: 80,
           ticker: 70,
         }
-        const headerHeight = this?.header?.headerHeight || defaults.header
+        const headerHidden = this?.header?.boardHeaderShow ?? false
+        console.log(headerHidden)
+        const headerHeight = !headerHidden ? 0 : this?.header?.boardHeaderHeight || defaults.header
         const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
         const adj = 5
         const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj

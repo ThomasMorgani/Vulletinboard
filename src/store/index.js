@@ -10,6 +10,7 @@ export default new Vuex.Store({
     appLoading: true,
     board: {},
     header: {},
+    item: {},
     items: [],
     snackbar: {
       options: {
@@ -134,7 +135,9 @@ export default new Vuex.Store({
         }
       }
     },
-
+    itemSet({ commit }, items) {
+      commit('COMMIT_ITEM', items)
+    },
     itemsSet({ commit }, items) {
       commit('COMMIT_ITEMS', items)
     },
@@ -188,6 +191,9 @@ export default new Vuex.Store({
     },
     COMMIT_HEADER(state, header) {
       state.header = { ...header }
+    },
+    COMMIT_ITEM(state, item) {
+      state.item = { ...item }
     },
     COMMIT_ITEMS(state, items) {
       state.items = [...items]

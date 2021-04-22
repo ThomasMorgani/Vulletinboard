@@ -91,9 +91,8 @@
           header: 80,
           ticker: 70,
         }
-        const headerHidden = this?.header?.boardHeaderShow ?? false
-        console.log(headerHidden)
-        const headerHeight = !headerHidden ? 0 : this?.header?.boardHeaderHeight || defaults.header
+        const headerShow = this?.header?.boardHeaderShow ?? false
+        const headerHeight = !headerShow ? 0 : this?.header?.boardHeaderHeight || defaults.header
         const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
         const adj = 5
         const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj
@@ -103,13 +102,12 @@
     },
     async created() {
       this.init()
-      return
     },
     beforeDestroy() {
       clearInterval(this.intervalId)
     },
     mounted() {
-      this.setHeight()
+      setTimeout(this.setHeight, 500)
     },
   }
 </script>

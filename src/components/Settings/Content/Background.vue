@@ -1,23 +1,30 @@
 <template>
   <v-card outlined class="">
-    <v-card-title class="text-h5 primary--text">
-      {{ boardSettings.boardBackground.label }}
+    <v-card-title class="text-h4 primary--text">
+      General
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">
-      <p class="">
-        {{ boardSettings.boardBackground.description }}
-      </p>
-      <v-select
-        color
-        v-model="mode"
-        :items="modeOptions"
-        :messages="mode === 'color' ? 'Set a static color' : 'The active image\'s dominant color will be used.'"
-        @input="onSelect"
-      ></v-select>
+      <v-card flat class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ boardSettings.boardBackground.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p class="">
+            {{ boardSettings.boardBackground.description }}
+          </p>
+          <v-select
+            color
+            v-model="mode"
+            :items="modeOptions"
+            :messages="mode === 'color' ? 'Set a static color' : 'The active image\'s dominant color will be used.'"
+            @input="onSelect"
+          ></v-select>
 
-      <v-sheet class="d-flex align-center justify-space-around mt-4" v-if="mode === 'color'">
-        <Colorpicker @input="colorSet" :btnProps="{ color, label: '     ', value: color, class: { 'mt-6': true } }"></Colorpicker>
-      </v-sheet>
+          <v-sheet class="d-flex align-center justify-space-around mt-4" v-if="mode === 'color'">
+            <Colorpicker @input="colorSet" :btnProps="{ color, label: '     ', value: color, class: { 'mt-6': true } }"></Colorpicker>
+          </v-sheet>
+        </v-card-text>
+      </v-card>
     </v-card-text>
     <v-card-actions class="pa-4">
       <v-btn tile color="success" :disabled="boardSettings.boardBackground.value === color" width="150" @click="colorSave">SAVE </v-btn>

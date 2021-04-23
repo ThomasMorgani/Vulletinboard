@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="" v-if="!loading">
-    <v-card-title class="text-h5 primary--text">
+    <v-card-title class="text-h4 primary--text">
       Ticker
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">

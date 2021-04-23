@@ -84,7 +84,7 @@
         if (this.intervalId) {
           clearInterval(this.intervalId)
         }
-        this.intervalId = setInterval(cb, time)
+        // this.intervalId = setInterval(cb, time)
       },
       setHeight() {
         const defaults = {

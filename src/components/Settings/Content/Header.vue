@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="">
-    <v-card-title class="text-h5 primary--text pb-2">
+    <v-card-title class="text-h4 primary--text pb-2">
       Header
     </v-card-title>
     <v-card-text class="d-flex flex-column align-start">

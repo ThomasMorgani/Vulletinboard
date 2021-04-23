@@ -11,11 +11,11 @@
       <div class="eventTop" v-if="items.length > 0"></div>
       <transition-group appear name="fade">
         <EventItem
-          v-for="(item, key) in items"
+          v-for="(item, idx) in items"
           :key="item.id"
           :id="`listItem${item.id}`"
           :item="item"
-          :isActive="key === 0"
+          :isActive="idx === 0"
           @itemClicked="$emit('selectItem', item)"
           class="eventItem my-1"
         ></EventItem>
@@ -34,7 +34,6 @@
       EventItem,
     },
     props: ['sheetHeight'],
-
     computed: {
       ...mapState({
         header: state => state.header,
@@ -44,20 +43,27 @@
     },
     methods: {
       setHeight() {
-        const defaults = {
-          header: 80,
-          ticker: 70,
-        }
-        const headerHeight = this?.header?.headerHeight || defaults.header
-        const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
-        const adj = 15
-        const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj
         const list = this.$refs.itemList.$el
-        list.style.setProperty('height', `calc(100vh - ${diff}px)`)
+
+        if (this.sheetHeight) {
+          console.log(this.sheetHeight)
+          list.style.setProperty('height', `${this.sheetHeight}`)
+          list.style.setProperty('z-index', 1)
+          return
+        }
+        // const defaults = {
+        //   header: 80,
+        //   ticker: 70,
+        // }
+        // const headerHeight = this?.header?.headerHeight || defaults.header
+        // const tickerHeight = this?.ticker?.tickerHeight || defaults.ticker
+        // const adj = 15
+        // const diff = parseInt(headerHeight) + parseInt(tickerHeight) + adj
+        // list.style.setProperty('height', `calc(100vh - ${diff}px)`)
       },
     },
     mounted() {
-      // this.setHeight()
+      this.setHeight()
     },
   }
 </script>

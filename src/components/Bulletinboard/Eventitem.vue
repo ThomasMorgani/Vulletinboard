@@ -1,7 +1,7 @@
 <template>
   <v-card
     :elevation="isActive ? '6' : '1'"
-    :color="isActive ? settings.itemTextTitle : settings.itemColor"
+    :color="isActive ? settings.itemColorActive : settings.itemColor"
     height="200"
     min-width="350"
     :outlined="isActive"
@@ -54,7 +54,7 @@
       },
       descriptionStyle() {
         return {
-          color: this.isActive ? this.settings.itemTextFooterActive : this.settings.itemTextFooter,
+          color: this.isActive ? this.settings.itemTextDescriptionActive : this.settings.itemTextDescription,
         }
       },
       footerStyle() {

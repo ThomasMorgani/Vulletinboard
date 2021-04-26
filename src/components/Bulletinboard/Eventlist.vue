@@ -1,10 +1,10 @@
 <template>
   <v-sheet id="itemList" ref="itemList" color="transparent" class="itemColumn d-flex flex-column justify-start  ma-1">
-    <v-card flat tile color="primary" ref="eventListTitleCard" class="white--text ">
+    <v-card flat tile :color="settings.itemListHeaderColor" ref="eventListTitleCard" class="white--text ">
       <v-card-title class="d-flex justify-space-between headline">
-        <v-icon color="white" @click="$emit('showPrevious')">mdi-calendar-arrow-left</v-icon>
-        <h4 class="text-h5">EVENTS</h4>
-        <v-icon color="white" @click="$emit('showNext')">mdi-calendar-arrow-right</v-icon>
+        <v-icon :color="settings.itemListHeaderTextColor" @click="$emit('showPrevious')">mdi-calendar-arrow-left</v-icon>
+        <h4 class="text-h5" :style="headerTextStyle" v-text="settings.itemListHeaderText"></h4>
+        <v-icon :color="settings.itemListHeaderTextColor" @click="$emit('showNext')">mdi-calendar-arrow-right</v-icon>
       </v-card-title>
     </v-card>
     <div group class="itemList">
@@ -37,9 +37,15 @@
     computed: {
       ...mapState({
         header: state => state.header,
+        settings: state => state.item,
         items: state => state.items,
         ticker: state => state.ticker,
       }),
+      headerTextStyle() {
+        return {
+          color: this.settings.itemListHeaderTextColor,
+        }
+      },
     },
     methods: {
       setHeight() {

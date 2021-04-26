@@ -1,111 +1,146 @@
 <template>
-  <v-card outlined class="">
+  <v-card outlined class="" ref="settingItem">
     <Eventlist v-if="itemlistPreview" class="eventList" sheetHeight="40em"></Eventlist>
     <v-card-title class="text-h4 primary--text">
       Item list
     </v-card-title>
-    <v-card-text class="d-flex ">
-      <!-- inactive card colors -->
-      <v-sheet color="transparent" class="d-flex flex-column align-start">
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemColor.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemColor.description }}</p>
-            <Colorpicker @input="setItem('color', 'itemColor', $event)" :btnProps="{ color: color }"></Colorpicker>
-          </v-card-text>
-        </v-card>
+    <v-card-text class="d-flex flex-column align-start">
+      <v-sheet color="transparent" class="d-flex">
+        <!-- inactive card colors -->
+        <v-sheet color="transparent" class="d-flex flex-column align-start">
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemColor.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemColor.description }}</p>
+              <Colorpicker @input="setItem('color', 'itemColor', $event)" :btnProps="{ color: color }"></Colorpicker>
+            </v-card-text>
+          </v-card>
 
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextTitle.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextTitle.description }}</p>
-            <Colorpicker @input="setItem('title', 'itemTextTitle', $event)" :btnProps="{ color: title }"></Colorpicker>
-          </v-card-text>
-        </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextTitle.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextTitle.description }}</p>
+              <Colorpicker @input="setItem('title', 'itemTextTitle', $event)" :btnProps="{ color: title }"></Colorpicker>
+            </v-card-text>
+          </v-card>
 
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextSubtitle.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextSubtitle.description }}</p>
-            <Colorpicker @input="setItem('subtitle', 'itemTextSubtitle', $event)" :btnProps="{ color: subtitle }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextDescription.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextDescription.description }}</p>
-            <Colorpicker @input="setItem('description', 'itemTextDescription', $event)" :btnProps="{ color: description }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextFooter.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextFooter.description }}</p>
-            <Colorpicker @input="setItem('footer', 'itemTextFooter', $event)" :btnProps="{ color: footer }"></Colorpicker>
-          </v-card-text>
-        </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextSubtitle.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextSubtitle.description }}</p>
+              <Colorpicker @input="setItem('subtitle', 'itemTextSubtitle', $event)" :btnProps="{ color: subtitle }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextDescription.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextDescription.description }}</p>
+              <Colorpicker @input="setItem('description', 'itemTextDescription', $event)" :btnProps="{ color: description }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextFooter.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextFooter.description }}</p>
+              <Colorpicker @input="setItem('footer', 'itemTextFooter', $event)" :btnProps="{ color: footer }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+        </v-sheet>
+        <!-- active card colors -->
+        <v-sheet color="transparent" class="d-flex flex-column align-start ml-4">
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemColorActive.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemColorActive.description }}</p>
+              <Colorpicker @input="setItem('colorActive', 'itemColorActive', $event)" :btnProps="{ color: colorActive }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextTitleActive.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextTitleActive.description }}</p>
+              <Colorpicker @input="setItem('titleActive', 'itemTextTitleActive', $event)" :btnProps="{ color: titleActive }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextSubtitleActive.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextSubtitleActive.description }}</p>
+              <Colorpicker @input="setItem('subtitleActive', 'itemTextSubtitleActive', $event)" :btnProps="{ color: subtitleActive }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextDescriptionActive.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextDescriptionActive.description }}</p>
+              <Colorpicker @input="setItem('descriptionActive', 'itemTextDescriptionActive', $event)" :btnProps="{ color: descriptionActive }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+          <v-card flat class="">
+            <v-card-title class="text-h5 primary--text">
+              {{ itemSettings.itemTextFooterActive.label }}
+            </v-card-title>
+            <v-card-text class="d-flex flex-column align-start">
+              <p>{{ itemSettings.itemTextFooterActive.description }}</p>
+              <Colorpicker @input="setItem('footerActive', 'itemTextFooterActive', $event)" :btnProps="{ color: footerActive }"></Colorpicker>
+            </v-card-text>
+          </v-card>
+        </v-sheet>
       </v-sheet>
-      <!-- active card colors -->
-      <v-sheet color="transparent" class="d-flex flex-column align-start ml-4">
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemColorActive.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemColorActive.description }}</p>
-            <Colorpicker @input="setItem('colorActive', 'itemColorActive', $event)" :btnProps="{ color: colorActive }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextTitleActive.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextTitleActive.description }}</p>
-            <Colorpicker @input="setItem('titleActive', 'itemTextTitleActive', $event)" :btnProps="{ color: titleActive }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextSubtitleActive.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextSubtitleActive.description }}</p>
-            <Colorpicker @input="setItem('subtitleActive', 'itemTextSubtitleActive', $event)" :btnProps="{ color: subtitleActive }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextDescriptionActive.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextDescriptionActive.description }}</p>
-            <Colorpicker @input="setItem('descriptionActive', 'itemTextDescriptionActive', $event)" :btnProps="{ color: descriptionActive }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-        <v-card flat class="">
-          <v-card-title class="text-h5 primary--text">
-            {{ itemSettings.itemTextFooterActive.label }}
-          </v-card-title>
-          <v-card-text class="d-flex flex-column align-start">
-            <p>{{ itemSettings.itemTextFooterActive.description }}</p>
-            <Colorpicker @input="setItem('footerActive', 'itemTextFooterActive', $event)" :btnProps="{ color: footerActive }"></Colorpicker>
-          </v-card-text>
-        </v-card>
-      </v-sheet>
+      <v-card flat width="100%" class="">
+        <v-card-title class="text-h5 primary--text pb-2">
+          {{ itemSettings.itemListHeaderText.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemSettings.itemListHeaderText.description }}</p>
+          <v-text-field
+            v-model="headerText"
+            color="primary"
+            messages="Enter display text"
+            prepend-inner-icon="mdi-format-text"
+            @input="setItem('headerText', 'itemListHeaderText', $event)"
+          ></v-text-field>
+        </v-card-text>
+      </v-card>
+      <v-card flat class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemSettings.itemListHeaderColor.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemSettings.itemListHeaderColor.description }}</p>
+          <Colorpicker @input="setItem('headerColor', 'itemListHeaderColor', $event)" :btnProps="{ color: headerColor }"></Colorpicker>
+        </v-card-text>
+      </v-card>
+      <v-card flat class="">
+        <v-card-title class="text-h5 primary--text">
+          {{ itemSettings.itemListHeaderTextColor.label }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column align-start">
+          <p>{{ itemSettings.itemListHeaderTextColor.description }}</p>
+          <Colorpicker @input="setItem('headerTextColor', 'itemListHeaderTextColor', $event)" :btnProps="{ color: headerTextColor }"></Colorpicker>
+        </v-card-text>
+      </v-card>
     </v-card-text>
     <v-card-actions class="pa-4">
-      <v-btn tile color="success" :disabled="actionDisabled" width="150">SAVE </v-btn>
+      <v-btn tile color="success" :disabled="actionDisabled" width="150" @click="saveItemSettings">SAVE </v-btn>
       <v-btn tile color="warning" :disabled="actionDisabled" @click="revertSettings">REVERT </v-btn>
       <v-spacer></v-spacer>
       <v-btn tile :color="itemlistPreview ? 'primary' : 'disabled'" @click="toggleItemlistPreview" class="font-weight-bold ">
@@ -147,7 +182,9 @@
       footerActive: null,
       headerColor: null,
       headerText: null,
+      headerTextColor: null,
       itemlistPreview: false,
+      loadingSave: false,
       metric: 'seconds',
       metricOptions: ['seconds', 'minutes', 'hours'],
       subtitle: null,
@@ -158,7 +195,9 @@
     }),
     computed: {
       actionDisabled() {
-        return false
+        const settings = this.formatWorkingSettings()
+        const isChanged = JSON.stringify(settings) === JSON.stringify(this.currentSettings)
+        return isChanged || this.loadingSave
       },
       itemSettings() {
         return this?.$store?.getters?.settingsByCat?.item || {}
@@ -194,6 +233,9 @@
           descriptionActive: this.itemSettings.itemTextDescriptionActive.value,
           footer: this.itemSettings.itemTextFooter.value,
           footerActive: this.itemSettings.itemTextFooterActive.value,
+          headerColor: this.itemSettings.itemListHeaderColor.value,
+          headerText: this.itemSettings.itemListHeaderText.value,
+          headerTextColor: this.itemSettings.itemListHeaderTextColor.value,
           subtitle: this.itemSettings.itemTextSubtitle.value,
           subtitleActive: this.itemSettings.itemTextSubtitleActive.value,
           timeout: this.itemSettings.itemTimeout.value,
@@ -217,21 +259,27 @@
           itemTextTitle: this.title,
           itemTextTitleActive: this.titleActive,
           itemTimeout: '7000',
-          // itemColor: '#FFFFFF',
-          // itemColorActive: '#FFFFFF',
-          // itemListHeaderColor: '#2C4776',
-          // itemListHeaderText: 'EVENTS',
-          // itemListHeaderTextColor: '#FFFFFF',
-          // itemTextDescription: '#2C4776',
-          // itemTextDescriptionActive: '#FFFFFF',
-          // itemTextFooter: '#2C4776',
-          // itemTextFooterActive: '#FFFFFF',
-          // itemTextSubtitle: '#2C4776',
-          // itemTextSubtitleActive: '#FFFFFF',
-          // itemTextTitle: '#2C4776',
-          // itemTextTitleActive: '#FFFFFF',
-          // itemTimeout: '7000',
         }
+        return data
+      },
+      formatWorkingSettings() {
+        const data = {
+          color: this.color,
+          colorActive: this.colorActive,
+          description: this.description,
+          descriptionActive: this.descriptionActive,
+          footer: this.footer,
+          footerActive: this.footerActive,
+          headerColor: this.headerColor,
+          headerText: this.headerText,
+          headerTextColor: this.headerTextColor,
+          subtitle: this.subtitle,
+          subtitleActive: this.subtitleActive,
+          timeout: this.timeout,
+          title: this.title,
+          titleActive: this.titleActive,
+        }
+
         return data
       },
       revertSettings() {
@@ -244,6 +292,19 @@
         this.currentSettings = { ...currentSettings }
         const settingsItem = this.formatItemSettings()
         this.$store.dispatch('itemSet', { ...this.$store.state.item, ...settingsItem })
+      },
+      async saveItemSettings() {
+        console.log('saveItemSettings')
+        const postData = this.formatItemSettings()
+        this.loadingSave = true
+        const resp = await this.$store.dispatch('apiPost', { endpoint: 'manage/settings/item', postData })
+        if (resp.status === 'success') {
+          this.$store.dispatch('settingsSet', postData)
+          this.revertSettings()
+        }
+        this.loadingSave = false
+        const { status: color, message } = resp
+        this.$store.dispatch('snackbar', { color, message, value: true })
       },
       setItem(item, itemSetting, val) {
         this[item] = val
@@ -303,6 +364,12 @@
         // this.$store.dispatch('itemSet', { ...this.$store.state.item, ...settings })
         this.$store.dispatch('itemsSet', items)
         this.itemlistPreview = !this.itemlistPreview
+        if (this.itemlistPreview) {
+          this.$refs.settingItem.$el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })
+          setTimeout(() => {
+            document.querySelector('html').scrollTop -= 150
+          }, 800)
+        }
       },
       toMilliseconds(val) {
         switch (this.metric) {
@@ -325,6 +392,9 @@
 </script>
 
 <style lang="scss" scoped>
+  .v-input {
+    width: 600px;
+  }
   .eventList {
     position: absolute;
     top: 0.5rem;
